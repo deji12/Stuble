@@ -124,3 +124,6 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 API_BIBLE_KEY = config('API_BIBLE_KEY')
+LOGIN_URL = 'login_user'
+
+AUTH_USER_MODEL = 'core.User'

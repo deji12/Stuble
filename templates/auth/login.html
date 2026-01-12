@@ -1,0 +1,23 @@
+{% extends 'auth/base.html' %}
+
+{% block content %}  
+
+<p class="h2">Login</p>
+<div class="form-container">
+    <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3 mt-3">
+            <label for="username" class="form-label">E-mail:</label>
+            <input type="email" class="form-control" id="username" value="{{email}}" placeholder="Enter email" name="email" required>
+            </div>
+            <div class="mb-3">
+            <label for="pwd" class="form-label">Password:</label>
+            <input type="password" class="form-control" id="pwd" placeholder="Enter password" name="password" required>
+        </div>
+        <p>Don't have an account? <a href="{% url 'register_user' %}">Register</a></p>
+        <p>Forgot your passsword? <a href="#"> Reset</a></p>
+        <button type="submit" class="btn btn-primary w-100">Login</button>
+    </form>
+</div>
+
+{% endblock content %}

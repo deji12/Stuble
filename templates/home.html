@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="container full-height d-flex flex-column justify-content-center align-items-center">
-    <p class="h2">Hello, {{request.user.full_name}}</p>
+    <p class="h2">Hello, {{request.user.first_name}}</p>
     <div class="d-flex gap-2">
     <!--- <button type="button" onclick="window.location.href = {% url 'bible' %}" class="btn btn-primary">Read bible</button> -->
 </div>

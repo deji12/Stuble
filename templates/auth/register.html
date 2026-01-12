@@ -1,0 +1,32 @@
+{% extends 'auth/base.html' %}
+
+{% block content %}
+<p class="h2">Register</p>
+<div class="form-container">
+    <form method="POST">
+      {% csrf_token %}
+      <div class="mb-3 mt-3">
+        <label for="first_name" class="form-label">First name:</label>
+        <input type="text" class="form-control" id="first_name" value="{{first_name}}" placeholder="Enter first name" name="first_name" required>
+      </div>
+      <div class="mb-3 mt-3">
+        <label for="last_name" class="form-label">Last name:</label>
+        <input type="text" class="form-control" id="last_name" value="{{last_name}}" placeholder="Enter last name" name="last_name" required>
+      </div>
+      <div class="mb-3 mt-3">
+        <label for="username" class="form-label">E-mail:</label>
+        <input type="email" class="form-control" id="username" value="{{email}}" placeholder="Enter email" name="email" required>
+      </div>
+      <div class="mb-3">
+        <label for="pwd" class="form-label">Password:</label>
+        <input type="password" class="form-control" minlength="5" id="pwd" placeholder="Enter password" name="password" required>
+      </div>
+      <input value="{{request.GET.next}}" hidden/>
+
+      <div class="form-check mb-3">
+        <p>Have an account? <a href="{% url 'login_user' %}">Login</a></p>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Register</button>
+    </form>
+</div>
+{% endblock content %}
