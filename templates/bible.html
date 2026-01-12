@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container full-height d-flex flex-column justify-content-center align-items-center">
+        
+    <p class="h2">Bible</p>
+    <div class="form-container">
+        <form method="POST" id="search-form">
+            <div class="mb-3 mt-3 row g-2 align-items-end">
+                <div class="col-auto">
+                    <label for="version" class="form-label">Version:</label>
+                    <select class="form-control form-select" id="version" name="version" style="min-width: 120px;">
+                        <option value="" disabled selected>Select Version</option>
+                        {% for version in bible_versions %}
+                            <option value="{{version.id}}">({{version.abbreviationLocal}}) {{version.name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <label for="book" class="form-label">Book:</label>
+                    <select class="form-control form-select" id="book" name="book" style="min-width: 120px;">
+                        <option value="" disabled selected>Select Book</option>
+                        {% for book in books %}
+                            <option value="{{book.id}}" >{{book.name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {{ books|json_script:"books-data" }}
+                <div class="col-auto">
+                    <label for="chapter" class="form-label">Chapter:</label>
+                    <select class="form-control form-select" id="chapter" name="chapter" style="min-width: 120px;">
+                        <option value="" disabled selected>Select Chapter</option>
+
+                    </select>
+                </div>
+
+                <div class="col-auto">
+                    <label for="verse" class="form-label">Verse:</label>
+                    <select class="form-control form-select" id="verse" name="verse" style="min-width: 120px;">
+                        <option value="" disabled selected>Select Verse</option>
+                    </select>
+                </div>
+
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-outline-primary mt-4" id="search-btn">Read</button>
+                </div>
+            </div>
+        </form>
+        <center>
+            <p id="register-error-message" style="color:firebrick; display:none;"><b></b></p>
+            <p id="register-success-message" style="color:#155724; display:none;"><b></b></p>
+        </center>
+    </div>
+    <div class="container" id="passage"></div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const bookSelect = document.getElementById('book');
+        const versionsSelect = document.getElementById("version");
+        const chapterSelect = document.getElementById('chapter');
+        const verseSelect = document.getElementById('verse');
+        const searchForm = document.getElementById('search-form');
+        const searchBtn = document.getElementById('search-btn');
+
+        const books = JSON.parse(
+            document.getElementById("books-data").textContent
+        );
+        
+        // Store the current book's chapters data
+        let currentBookChaptersData = null;
+        
+        // Handle book selection
+        bookSelect.addEventListener('change', function () {
+            chapterSelect.innerHTML = '<option disabled selected>Select Chapter</option>';
+            verseSelect.innerHTML = '<option disabled selected>Select Verse</option>';
+
+            const selectedBookId = this.value;
+            const book = books.find(b => b.id === selectedBookId);
+
+            if (!book) return;
+
+            currentBookChaptersData = Object.assign({}, ...book.chapters);
+
+            Object.entries(currentBookChaptersData).forEach(([chapter, verses]) => {
+                const option = document.createElement('option');
+                // option.value = chapter;
+                option.value = `${selectedBookId}.${chapter}`; 
+                option.textContent = `Chapter ${chapter}`;
+                chapterSelect.appendChild(option);
+            });
+        });
+
+        
+        // Handle chapter selection
+        chapterSelect.addEventListener('change', function() {
+            // Clear existing verse options
+            verseSelect.innerHTML = '<option value="" disabled selected>Select Verse</option>';
+            
+            const selectedChapter = this.value;
+            
+            if (selectedChapter && currentBookChaptersData) {
+                // Get the number of verses for this chapter
+                const chapter = parseInt(selectedChapter.split(".")[1])
+                const versesCount = currentBookChaptersData[chapter];
+                console.log(`Chapter ${chapter} has ${versesCount} verses`);
+                
+                if (versesCount) {
+                    // Create verse options from 1 to total verses
+                    for (let i = 1; i <= versesCount; i++) {
+                        const option = document.createElement('option');
+                        option.value = i;
+                        option.textContent = i;
+                        verseSelect.appendChild(option);
+                    }
+                }
+            }
+        });
+
+        searchForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const bibleId = versionsSelect.value;  
+            const chapterId = chapterSelect.value;
+            const verseId = verseSelect.value
+
+            if (bibleId && chapterId) {
+                searchBtn.disabled = true;
+                loadChapter(bibleId, chapterId, verseId);
+            }
+        });
+
+        async function loadChapter(bibleId, chapterId, verseId) {
+            // Show loading text immediately
+            document.getElementById("passage").innerHTML = "<em>Loading...</em>";
+
+            let urlEndpoint = `/api/bible/passage/?bibleId=${bibleId}&chapterId=${chapterId}`
+            if (verseId) {
+                urlEndpoint += `&verseId=${verseId}`
+            }
+            try {
+                const response = await fetch(
+                    urlEndpoint
+                );
+
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status} ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                // Render the actual passage content
+                document.getElementById("passage").innerHTML = data.data.content;
+                searchBtn.disabled = false;
+            } catch (error) {
+                // Show error message if fetch fails
+                document.getElementById("passage").innerHTML = `<span style="color:red;">Failed to load passage: ${error.message}</span>`;
+                searchBtn.disabled = false;
+            }
+        }
+    });
+
+
+    // loadChapter("de4e12af7f28f599-02", "GEN.1");
+
+</script>
+<style>
+    #passage {
+        max-width: 720px;
+        margin: 40px auto;
+        font-family: "Georgia", serif;
+        line-height: 1.8;
+        font-size: 18px;
+        color: #222;
+    }
+
+    #passage p.p {
+        margin-bottom: 1.2em;
+    }
+
+    #passage span.v {
+        font-weight: bold;
+        font-size: 0.85em;
+        vertical-align: super;
+        color: #555;
+        margin-right: 4px;
+    }
+
+    #passage span.add {
+        font-style: italic;
+        opacity: 0.8;
+    }
+
+</style>
+
+{% endblock content %}
