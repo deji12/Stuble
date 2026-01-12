@@ -7,6 +7,7 @@ import uuid
 from django.core.mail import EmailMessage
 from django.conf import settings
 from django.urls import reverse
+from django.utils import timezone
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -72,3 +73,7 @@ class PasswordResetCode(models.Model):
     
     def __str__(self):
         return f'Password reset for {self.user.username} at {self.created_when}'
+    
+    def is_valid(self):
+        expiration_time = self.created_when + timezone.timedelta(minutes=10)
+        return timezone.now() < expiration_time

@@ -15,7 +15,7 @@
             <input type="password" class="form-control" id="pwd" placeholder="Enter password" name="password" required>
         </div>
         <p>Don't have an account? <a href="{% url 'register_user' %}">Register</a></p>
-        <p>Forgot your passsword? <a href="#"> Reset</a></p>
+        <p>Forgot your passsword? <a href="{% url 'forgot_password' %}"> Reset</a></p>
         <button type="submit" class="btn btn-primary w-100">Login</button>
     </form>
 </div>
