@@ -8,6 +8,8 @@ from django.core.mail import EmailMessage
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
+from django_quill.fields import QuillField
+from cloudinary.models import CloudinaryField
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -77,3 +79,34 @@ class PasswordResetCode(models.Model):
     def is_valid(self):
         expiration_time = self.created_when + timezone.timedelta(minutes=10)
         return timezone.now() < expiration_time
+    
+class Record(models.Model):
+
+    user = models.ForeignKey(User, on_delete = models.CASCADE, related_name='records')
+    title = models.CharField(max_length=100)
+    note = QuillField()
+    number_of_images = models.PositiveIntegerField(default=0)
+    number_of_passages = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return self.title
+    
+class RecordPassage(models.Model):
+    
+    record = models.ForeignKey(Record, on_delete=models.CASCADE, related_name='record_passages')
+    bible_id = models.CharField(max_length=10)
+    chapter_id = models.CharField(max_length=10)
+    verse_id = models.CharField(max_length=10, default='', null=True, blank=True)
+    content = models.TextField()
+    
+    def __str__(self):
+        return f"{self.bible_id} {self.chapter_id}:{self.verse_id}" 
+
+class RecordImage(models.Model):
+    record = models.ForeignKey(Record, on_delete=models.CASCADE, related_name='record_images')
+    image = CloudinaryField(folder=f'{settings.CLOUDINARY_MEDIA_PREFIX_URL}/record_images/', blank=True, null=True)
+
+class Collection(models.Model):
+    title = models.CharField(max_length=100)
+    user = models.ForeignKey(User, on_delete = models.CASCADE, related_name='collections')
+    records = models.ManyToManyField(Record)
