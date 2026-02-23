@@ -7,10 +7,11 @@ from django.views.decorators.http import require_GET
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import User, PasswordResetCode
+from .models import User, PasswordResetCode, Record, RecordPassage, RecordImage, WaitingList
 from django.contrib import messages
 from .utils import is_valid_email
 from django.urls import reverse
+from .forms import RecordNoteForm
 
 API_BIBLE_BASE_URL = "https://rest.api.bible/v1"
 
@@ -25,7 +26,26 @@ def bible(request):
         "books": books,
         "bible_versions": versions
     }
-    return render(request, "bible.html", context)
+    return render(request, "bible/bible.html", context)
+
+def waiting_list(request):
+
+    if request.method == 'POST':
+        email = request.POST.get('email')
+
+        if not email:
+            messages.error(request, "Email field is required")
+            return redirect('waiting_list')
+        
+        email, created = WaitingList.objects.get_or_create(email=email)
+        if created:
+            messages.success(request, 'Your email has been added to our waiting list')
+        else:
+            messages.success(request, 'You already joined the waiting list')
+        return redirect('waiting_list')
+
+
+    return render(request, 'waiting_list.html')
 
 @require_GET
 def get_chapter_passage(request):
@@ -213,3 +233,56 @@ def reset_password(request, reset_id):
         return redirect('reset_user_password', reset_id=reset_id)
 
     return render(request, 'auth/reset_password.html')
+
+@login_required
+def create_record(request):
+
+    user = request.user
+
+    if request.method == "POST":
+        title = request.POST.get('title')
+        scriptures = request.POST.getlist('scriptures[]')
+        
+        form = RecordNoteForm(request.POST)
+        if form.is_valid():
+            record_content = form.cleaned_data['note']
+
+        record = Record.objects.create(
+            user = user,
+            title = title,
+            note = record_content
+        )
+
+        if scriptures:
+            for scripture in scriptures:
+                scripture = scripture.split('|')
+                
+                bible_version_id = scripture[0]
+                chapter = scripture[1]
+                verse = scripture[2]
+                passage_content = scripture[3]
+
+                RecordPassage.objects.create(
+                    record = record,
+                    bible_id = bible_version_id,
+                    chapter_id = chapter,
+                    verse_id = verse,
+                    content = passage_content
+                )
+
+            record.number_of_passages = len(scriptures)
+            record.save(update_fields=['number_of_passages'])
+
+        messages.success(request, 'Record created successfully')
+        return redirect('create_record')
+
+    context = {
+        "form": RecordNoteForm(),
+        "books": books,
+        "bible_versions": versions
+    }
+    return render(request, 'records/create_record.html', context)
+
+@login_required
+def user_records(request):
+    return render(request, 'records/user_records.html')

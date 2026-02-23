@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container full-height d-flex flex-column justify-content-center align-items-center">
+        
+    <p class="h2">Bible</p>
+    <div class="form-container">
+        <form method="POST" id="search-form">
+            <div class="mb-3 mt-3 row g-2 align-items-end">
+                <div class="col-auto">
+                    <label for="version" class="form-label">Version:</label>
+                    <select class="form-control form-select" id="version" name="version" style="min-width: 120px;">
+                        <option value="" disabled selected>Select Version</option>
+                        {% for version in bible_versions %}
+                            <option value="{{version.id}}">({{version.abbreviationLocal}}) {{version.name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <input type="text" class="form-control" id="record-form" value="no" hidden>
+                <div class="col-auto">
+                    <label for="book" class="form-label">Book:</label>
+                    <select class="form-control form-select" id="book" name="book" style="min-width: 120px;">
+                        <option value="" disabled selected>Select Book</option>
+                        {% for book in books %}
+                            <option value="{{book.id}}" >{{book.name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {{ books|json_script:"books-data" }}
+                <div class="col-auto">
+                    <label for="chapter" class="form-label">Chapter:</label>
+                    <select class="form-control form-select" id="chapter" name="chapter" style="min-width: 120px;">
+                        <option value="" disabled selected>Select Chapter</option>
+
+                    </select>
+                </div>
+
+                <div class="col-auto">
+                    <label for="verse" class="form-label">Verse:</label>
+                    <select class="form-control form-select" id="verse" name="verse" style="min-width: 120px;">
+                        <option value="" disabled selected>Select Verse</option>
+                    </select>
+                </div>
+
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-outline-primary mt-4" id="search-btn">Read</button>
+                </div>
+            </div>
+        </form>
+        <center>
+            <p id="register-error-message" style="color:firebrick; display:none;"><b></b></p>
+            <p id="register-success-message" style="color:#155724; display:none;"><b></b></p>
+        </center>
+    </div>
+    <div class="container" id="passage"></div>
+</div>
+
+{% include 'bible/script_and_style.html' %}
+
+{% endblock content %}

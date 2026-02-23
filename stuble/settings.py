@@ -138,3 +138,32 @@ CLOUDINARY_STORAGE = {
 }
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 CLOUDINARY_MEDIA_PREFIX_URL = 'stuble/'
+
+QUILL_CONFIGS = {
+    'default':{
+        'theme': 'snow',
+        'placeholder': 'Record content',
+        'label': ' ',
+        'modules': {
+            'syntax': True,
+            'toolbar': [
+                [
+                {"font": []},
+                {"header": []},
+                {"align": []},
+                "bold",
+                "italic",
+                "underline",
+                "strike",
+                "blockquote",
+                {"color": []},
+                {"background": []},
+                "code-block",
+            ],
+            ["code-block", "link", "image"],
+            ["clean"],
+            ]
+        }
+    }
+    
+}

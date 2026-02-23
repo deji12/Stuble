@@ -110,3 +110,10 @@ class Collection(models.Model):
     title = models.CharField(max_length=100)
     user = models.ForeignKey(User, on_delete = models.CASCADE, related_name='collections')
     records = models.ManyToManyField(Record)
+
+class WaitingList(models.Model):
+    
+    email = models.EmailField()
+
+    def __str__(self):
+        return self.email

@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{form.media}}
+<div class="container full-height d-flex flex-column justify-content-center align-items-center">
+
+    <br>
+    <p class="h2">Create Record</p>
+    <div class="form-container">
+        <form id="add-record-form" method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="title" class="form-label">Title:</label>
+                <input type="text" class="form-control" name="title" placeholder="Record title" required>
+            </div>
+            <input type="text" id="record-form" value="yes" hidden>
+            <div class="mb-3">
+                {{form.note}}
+            </div>
+            
+            <div class="d-grid gap-2 d-md-block">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    + Scripture
+                </button>
+                <button class="btn btn-primary" type="submit">Submit</button>
+            </div>
+        </form>
+        <br>
+        <div class="accordion passage" id="accordionFlushExample">
+           
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">Select scripture</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="form-container">
+                <form method="POST" id="search-form">
+                    {% csrf_token %}
+                    <div class="mb-3 mt-3 row g-2 align-items-end">
+                        <div class="col-auto">
+                            <label for="version" class="form-label">Version:</label>
+                            <select class="form-control form-select" id="version" name="version" style="min-width: 120px;" required>
+                                <option value="" disabled selected>Select Version</option>
+                                {% for version in bible_versions %}
+                                    <option value="{{version.id}},{{version.abbreviationLocal}}">({{version.abbreviationLocal}}) {{version.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <label for="book" class="form-label">Book:</label>
+                            <select class="form-control form-select" id="book" name="book" style="min-width: 120px;" required>
+                                <option value="" disabled selected>Select Book</option>
+                                {% for book in books %}
+                                    <option value="{{book.id}},{{book.name}}" >{{book.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {{ books|json_script:"books-data" }}
+                        <div class="col-auto">
+                            <label for="chapter" class="form-label">Chapter:</label>
+                            <select class="form-control form-select" id="chapter" name="chapter" style="min-width: 120px;" required>
+                                <option value="" disabled selected>Select Chapter</option>
+
+                            </select>
+                        </div>
+
+                        <div class="col-auto">
+                            <label for="verse" class="form-label">Verse:</label>
+                            <select class="form-control form-select" id="verse" name="verse" style="min-width: 120px;">
+                                <option value="" disabled selected>Select Verse</option>
+                            </select>
+                        </div>
+
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-outline-primary mt-4" id="search-btn">Search</button>
+                        </div>
+                    </div>
+                </form>
+                <center>
+                    <p id="register-error-message" style="color:firebrick; display:none;"><b></b></p>
+                    <p id="register-success-message" style="color:#155724; display:none;"><b></b></p>
+                </center>
+            </div>
+            <div class="container passage" id="passage">
+            
+            </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="add-scripture-btn">Add scripture</button>
+        </div>
+    </div>
+  </div>
+</div>
+
+<style>
+    .ql-container {
+        height: 200px;  
+    }
+</style>
+{% include 'bible/script_and_style.html' %}
+{% endblock content %}
