@@ -19,9 +19,9 @@ from .views import (
 
 urlpatterns = [
 
-    # path('', waiting_list, name='waiting_list'),
+    path('', waiting_list, name='waiting_list'),
 
-    path('', home, name='home'),
+    # path('', home, name='home'),
 
     # auth
     # path('register/', register, name='register_user'),
