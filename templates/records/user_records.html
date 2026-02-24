@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container full-height d-flex flex-column justify-content-center align-items-center">
+        
+    <p class="h2">Records</p>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for record in records %}
+            <div class="col">
+                <div class="card" style="width: 18rem;">
+                    <img src="https://res.cloudinary.com/the-proton-guy/image/upload/v1771929301/images_gxvpl8.jpg" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title">{{record.title}}</h5>
+                        <p class="card-text">{{record.note.plain|truncatechars:30}}</p>
+                    </div>
+                    <ul class="list-group card-footer">
+                        <li class="list-group-item">Created: {{record.created_at}}</li>
+                    </ul>
+                    <div class="card-footer">
+                        <small class="text-body-secondary">Last updated {{record.last_updated_at}}</small>
+                    </div>
+                    <div class="card-body">
+                        <a href="#" class="card-link ">View</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock content %}

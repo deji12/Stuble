@@ -88,6 +88,9 @@ class Record(models.Model):
     number_of_images = models.PositiveIntegerField(default=0)
     number_of_passages = models.PositiveIntegerField(default=0)
 
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    last_updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+
     def __str__(self):
         return self.title
     

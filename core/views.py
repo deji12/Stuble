@@ -285,4 +285,9 @@ def create_record(request):
 
 @login_required
 def user_records(request):
-    return render(request, 'records/user_records.html')
+
+    records = Record.objects.filter(user=request.user)
+    context = {
+        'records': records
+    }
+    return render(request, 'records/user_records.html', context)
