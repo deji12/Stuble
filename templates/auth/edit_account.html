@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Account - Stuble{% endblock %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/settings.css' %}">
+{% block content %}
+<div class="container py-5">
+    <!-- Header Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h2 class="display-5 fw-bold text-primary mb-3">
+                <i class="bi bi-person-gear me-2"></i>Edit Account
+            </h2>
+            <p class="text-muted">Update your personal information and password</p>
+            <hr class="opacity-25 w-25 mx-auto">
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4 p-4">
+                <div class="card-body">
+                    <!-- Form Header -->
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
+                            <i class="bi bi-person-circle fs-4 text-primary"></i>
+                        </div>
+                        <div>
+                            <h3 class="h5 fw-semibold mb-1">Account Settings</h3>
+                            <p class="text-muted small mb-0">Manage your profile and security</p>
+                        </div>
+                    </div>
+
+                    <!-- Messages -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Edit Account Form -->
+                    <form method="POST" id="edit-account-form">
+                        {% csrf_token %}
+                        
+                        <!-- Personal Information Section -->
+                        <div class="mb-4">
+                            <h6 class="fw-semibold mb-3 text-secondary">
+                                <i class="bi bi-info-circle me-2"></i>Personal Information
+                            </h6>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-secondary small text-uppercase tracking-wide">
+                                        <i class="bi bi-person me-1"></i>First Name
+                                    </label>
+                                    <input type="text" class="form-control form-control-lg rounded-3 border-0 bg-light" 
+                                           name="first_name" value="{{ first_name }}" placeholder="John" required>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-secondary small text-uppercase tracking-wide">
+                                        <i class="bi bi-person me-1"></i>Last Name
+                                    </label>
+                                    <input type="text" class="form-control form-control-lg rounded-3 border-0 bg-light" 
+                                           name="last_name" value="{{ last_name }}" placeholder="Doe" required>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold text-secondary small text-uppercase tracking-wide">
+                                        <i class="bi bi-envelope me-1"></i>Email Address
+                                    </label>
+                                    <input type="email" class="form-control form-control-lg rounded-3 border-0 bg-light" 
+                                           name="email" value="{{ email }}" placeholder="john@example.com" required>
+                                    <small class="text-muted mt-2 d-block">
+                                        <i class="bi bi-info-circle me-1"></i>Changing your email will update your login username
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Password Change Section -->
+                        <div class="mb-4">
+                            <h6 class="fw-semibold mb-3 text-secondary">
+                                <i class="bi bi-shield-lock me-2"></i>Change Password
+                            </h6>
+                            <p class="text-muted small mb-3">Leave blank if you don't want to change your password</p>
+                            
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold text-secondary small text-uppercase tracking-wide">
+                                        <i class="bi bi-key me-1"></i>Current Password
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control form-control-lg rounded-3 border-0 bg-light" 
+                                               name="current_password" id="current_password" placeholder="Enter current password">
+                                        <button class="btn btn-outline-secondary toggle-password" type="button" data-target="current_password">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-secondary small text-uppercase tracking-wide">
+                                        <i class="bi bi-key me-1"></i>New Password
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control form-control-lg rounded-3 border-0 bg-light" 
+                                               name="new_password" id="new_password" placeholder="Enter new password">
+                                        <button class="btn btn-outline-secondary toggle-password" type="button" data-target="new_password">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-secondary small text-uppercase tracking-wide">
+                                        <i class="bi bi-key me-1"></i>Confirm Password
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control form-control-lg rounded-3 border-0 bg-light" 
+                                               name="confirm_password" id="confirm_password" placeholder="Confirm new password">
+                                        <button class="btn btn-outline-secondary toggle-password" type="button" data-target="confirm_password">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Password strength indicator (optional) -->
+                            <div class="password-strength mt-3 d-none" id="password-strength">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small class="text-muted">Password strength:</small>
+                                    <small class="fw-semibold" id="strength-text">Weak</small>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar" id="strength-bar" role="progressbar" style="width: 0%;"></div>
+                                </div>
+                                <small class="text-muted d-block mt-2">
+                                    <i class="bi bi-info-circle me-1"></i>Use at least 6 characters with letters and numbers
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex gap-3 justify-content-end">
+                            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary rounded-3 px-4 py-2">
+                                <i class="bi bi-x-lg me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary rounded-3 px-4 py-2" id="submit-btn">
+                                <i class="bi bi-check-circle me-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Account Actions Card -->
+            <div class="card border-0 shadow-sm rounded-4 mt-4">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-danger bg-opacity-10 p-3 rounded-3 me-3">
+                            <i class="bi bi-shield-exclamation fs-4 text-danger"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-semibold mb-1">Danger Zone</h5>
+                            <p class="text-muted small mb-2">Permanently delete your account and all associated data</p>
+                            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                                <i class="bi bi-trash3 me-1"></i>Delete Account
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger text-white border-0 rounded-top-4">
+                <div>
+                    <h5 class="modal-title fw-semibold">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Delete Account
+                    </h5>
+                    <small class="text-white-50">This action cannot be undone</small>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="text-center mb-4">
+                    <div class="bg-danger bg-opacity-10 rounded-circle p-3 d-inline-flex mb-3">
+                        <i class="bi bi-trash3 fs-1 text-danger"></i>
+                    </div>
+                    <h6 class="fw-semibold mb-2">Are you absolutely sure?</h6>
+                    <p class="text-muted mb-0">
+                        This will permanently delete your account and all your records, passages, and data.
+                    </p>
+                </div>
+                <div class="bg-light rounded-3 p-3 mb-3">
+                    <p class="small text-muted mb-2">
+                        <i class="bi bi-info-circle me-1"></i>
+                        To confirm, please type <strong class="text-dark">DELETE</strong> below:
+                    </p>
+                    <input type="text" class="form-control" id="delete-confirm" placeholder="DELETE">
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                <button type="button" class="btn btn-outline-secondary rounded-3" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg me-2"></i>Cancel
+                </button>
+                <form method="POST" action="{% url 'delete_account' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger rounded-3" id="delete-account-btn" disabled>
+                        <i class="bi bi-trash3 me-2"></i>Permanently Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/settings.js' %}"></script>
+{% endblock %}

@@ -12,9 +12,13 @@ from django.contrib import messages
 from .utils import is_valid_email
 from django.urls import reverse
 from .forms import RecordNoteForm
-
+from django.contrib.auth import update_session_auth_hash
 
 API_BIBLE_BASE_URL = "https://rest.api.bible/v1"
+
+
+def landing(request):
+    return render(request, 'index.html')
 
 @login_required
 def home(request):
@@ -53,7 +57,7 @@ def waiting_list(request):
             messages.success(request, 'Your email has been added to our waiting list')
         else:
             messages.success(request, 'You already joined the waiting list')
-        return redirect('waiting_list')
+        return redirect('wait_list')
 
 
     return render(request, 'waiting_list.html')
@@ -94,6 +98,11 @@ def get_chapter_passage(request):
         )
 
     return JsonResponse(response.json(), safe=False)
+
+
+# ----------------------------------------------------------------
+#                       USER & AUTH
+#-----------------------------------------------------------------
 
 def register(request):
 
@@ -159,7 +168,9 @@ def login_user(request):
         user = authenticate(request=request, username=email, password=password)
         if user is not None:
             login(request, user)
-            return redirect('home')
+
+            next = request.GET.get('next')
+            return redirect(next or 'dashboard')
 
         messages.error(request, 'Invalid credentials provided')
         return redirect('login_user')
@@ -168,7 +179,7 @@ def login_user(request):
 
 def logout_user(request):
     logout(request)
-    return redirect('login_user')
+    return redirect('landing_page')
 
 def forgot_password(request):
 
@@ -246,6 +257,97 @@ def reset_password(request, reset_id):
     return render(request, 'auth/reset_password.html')
 
 @login_required
+def edit_account(request):
+    user = request.user
+    
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        email = request.POST.get('email', '').strip()
+        current_password = request.POST.get('current_password', '')
+        new_password = request.POST.get('new_password', '')
+        confirm_password = request.POST.get('confirm_password', '')
+        
+        data_has_error = False
+        
+        # Validate required fields
+        if not (first_name and last_name and email):
+            messages.error(request, 'First name, last name and email are required')
+            data_has_error = True
+        
+        # Validate email format
+        if email and not is_valid_email(email):
+            messages.error(request, 'You have entered an invalid email')
+            data_has_error = True
+        
+        # Check if email is taken by another user
+        if email and email != user.email:
+            if User.objects.filter(email=email).exclude(id=user.id).exists():
+                messages.error(request, 'This email is already taken by another user')
+                data_has_error = True
+        
+        # If changing password, validate current password
+        if new_password or confirm_password:
+            if not user.check_password(current_password):
+                messages.error(request, 'Current password is incorrect')
+                data_has_error = True
+            elif new_password != confirm_password:
+                messages.error(request, 'New passwords do not match')
+                data_has_error = True
+            elif len(new_password) < 6:
+                messages.error(request, 'New password must be at least 6 characters long')
+                data_has_error = True
+        
+        if data_has_error:
+            context = {
+                'first_name': first_name,
+                'last_name': last_name,
+                'email': email,
+            }
+            return render(request, 'auth/edit_account.html', context)
+        
+        # Update user information
+        user.first_name = first_name
+        user.last_name = last_name
+        user.email = email
+        
+        # Update password if provided
+        if new_password:
+            user.set_password(new_password)
+            user.save()
+            update_session_auth_hash(request, user)  # Keep user logged in
+            messages.success(request, 'Your password has been updated successfully!')
+        else:
+            user.save()
+            messages.success(request, 'Your account has been updated successfully!')
+        
+        return redirect('settings')
+    
+    # GET request - display form with current user data
+    context = {
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'email': user.email,
+    }
+    return render(request, 'auth/edit_account.html', context)
+
+@login_required
+def delete_account(request):
+    if request.method == 'POST':
+        user = request.user
+        # Log the user out
+        logout(request)
+        # Delete the user
+        user.delete()
+        messages.success(request, 'Your account has been permanently deleted.')
+        return redirect('register_user')
+    return redirect('edit_account')
+
+# ----------------------------------------------------------------
+#                       RECORDS
+#-----------------------------------------------------------------
+
+@login_required
 def create_record(request):
 
     user = request.user
@@ -299,12 +401,19 @@ def create_record(request):
     }
     return render(request, 'records/create_record.html', context)
 
+from django.db.models import Q
+
 @login_required
 def user_records(request):
-
-    records = Record.objects.filter(user=request.user, is_deleted=False).order_by('-id')
+    records = Record.objects.filter(user=request.user).order_by('-created_at')
+    
+    search_query = request.GET.get('q', '')
+    if search_query:
+        records = records.filter(title__icontains=search_query)
+    
     context = {
-        'records': records
+        'records': records,
+        'search_query': search_query,
     }
     return render(request, 'records/user_records.html', context)
 
@@ -413,3 +522,11 @@ def delete_record(request, record_id):
         messages.error(request, 'Record does not exist')
         
     return redirect('user_records')
+
+@login_required
+def collections(request):
+
+    context = {
+
+    }
+    return render(request, 'collection/collections.html', context)

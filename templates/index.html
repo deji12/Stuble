@@ -1,0 +1,621 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section -->
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-100">
+            <div class="col-lg-6 text-center text-lg-start mb-5 mb-lg-0">
+                <!-- Badge -->
+                <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 mb-4">
+                    <i class="bi bi-star-fill me-1"></i> Your Digital Bible Study Companion
+                </span>
+                
+                <!-- Main Heading -->
+                <h1 class="display-3 fw-bold mb-4">
+                    Study Scripture
+                    <span class="gradient-text">Deeper</span>
+                    <br />Track Your Journey
+                </h1>
+                
+                <!-- Description -->
+                <p class="lead text-secondary mb-5" style="font-size: 1.25rem; max-width: 90%;">
+                    Stuble helps you dive deep into God's Word. Read multiple Bible versions, 
+                    take notes, create records, and track your spiritual growth all in one place.
+                </p>
+                
+                <!-- CTA Buttons - Conditional based on user authentication -->
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start">
+                    {% if request.user.is_authenticated %}
+                        <!-- Logged-in user buttons -->
+                        <a href="{% url 'bible' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-3">
+                            <i class="bi bi-book-half me-2"></i>Start Reading
+                        </a>
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-primary btn-lg px-5 py-3 rounded-3">
+                            <i class="bi bi-grid-3x3-gap-fill me-2"></i>Dashboard
+                        </a>
+                    {% else %}
+                        <!-- Logged-out user buttons -->
+                        <!-- <a href="{% url 'bible' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-3">
+                            <i class="bi bi-book-half me-2"></i>Start Reading
+                        </a>
+                        <a href="https://youtu.be/_EIFhYawWJ0?si=cb4MXBZRhDHYCQ7l" target="_blank" class="btn btn-outline-primary btn-lg px-5 py-3 rounded-3">
+                            <i class="bi bi-play-circle me-2"></i>Watch Demo
+                        </a> -->
+                            <!-- Public waiting list CTA -->
+                        <a href="{% url 'wait_list' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-3">
+                            <i class="bi bi-megaphone me-2"></i>Join Waitlist
+                        </a>
+                        <a href="https://youtu.be/_EIFhYawWJ0?si=cb4MXBZRhDHYCQ7l" target="_blank" class="btn btn-outline-primary btn-lg px-5 py-3 rounded-3">
+                            <i class="bi bi-play-circle me-2"></i>Watch Demo
+                        </a>
+                    {% endif %}
+                </div>
+                
+                <!-- Stats (shown to everyone) -->
+                <div class="d-flex gap-4 mt-5">
+                    <div>
+                        <h4 class="fw-bold mb-1">50+</h4>
+                        <p class="text-muted small">Bible Versions</p>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-1">10K+</h4>
+                        <p class="text-muted small">Active Users</p>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-1">100K+</h4>
+                        <p class="text-muted small">Passages Saved</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hero Image (same for everyone) -->
+            <div class="col-lg-6">
+                <div class="position-relative">
+                    <!-- Main Card -->
+                    <div class="hero-card p-4">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
+                                <i class="bi bi-book-half fs-2 text-primary"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-semibold mb-1">Today's Reading</h5>
+                                <p class="text-muted small mb-0">Psalm 23:1-6</p>
+                            </div>
+                        </div>
+                        
+                        <div class="passage-preview mb-4">
+                            <p class="verse-text mb-2">
+                                <span class="verse-number">1</span> The Lord is my shepherd; I shall not want.
+                            </p>
+                            <p class="verse-text mb-2">
+                                <span class="verse-number">2</span> He maketh me to lie down in green pastures: he leadeth me beside the still waters.
+                            </p>
+                            <p class="verse-text">
+                                <span class="verse-number">3</span> He restoreth my soul...
+                            </p>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-light text-dark">KJV</span>
+                            <a href="#" class="text-primary text-decoration-none small">
+                                Continue Reading <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Floating Cards -->
+                    <div class="floating-card notes-card">
+                        <i class="bi bi-journal-text text-primary me-2"></i>
+                        <span>Study Notes</span>
+                    </div>
+                    <div class="floating-bookmark-card">
+                        <i class="bi bi-bookmark-heart-fill text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section py-5">
+    <div class="container">
+        <!-- Section Header -->
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 mb-3">
+                    <i class="bi bi-grid me-1"></i> Features
+                </span>
+                <h2 class="display-5 fw-bold mb-3">Everything You Need for</h2>
+                <h2 class="display-5 fw-bold gradient-text mb-4">Meaningful Bible Study</h2>
+                <p class="text-secondary" style="max-width: 600px; margin: 0 auto;">
+                    Powerful tools to help you engage with Scripture, organize your insights, 
+                    and grow in your faith journey.
+                </p>
+            </div>
+        </div>
+        
+        <!-- Features Grid -->
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card p-4">
+                    <div class="feature-icon mb-4">
+                        <i class="bi bi-book-half"></i>
+                    </div>
+                    <h5 class="fw-semibold mb-3">Multiple Bible Versions</h5>
+                    <p class="text-muted small">
+                        Access 50+ Bible translations including KJV, NIV, ESV, and more. 
+                        Compare versions side by side.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card p-4">
+                    <div class="feature-icon mb-4">
+                        <i class="bi bi-pencil-square"></i>
+                    </div>
+                    <h5 class="fw-semibold mb-3">Rich Note Taking</h5>
+                    <p class="text-muted small">
+                        Take detailed notes with our rich text editor. Add formatting, 
+                        highlights, and organize your thoughts.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card p-4">
+                    <div class="feature-icon mb-4">
+                        <i class="bi bi-bookmarks"></i>
+                    </div>
+                    <h5 class="fw-semibold mb-3">Save Passages</h5>
+                    <p class="text-muted small">
+                        Bookmark and save your favorite passages. Create collections 
+                        for different topics or studies.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card p-4">
+                    <div class="feature-icon mb-4">
+                        <i class="bi bi-search-heart"></i>
+                    </div>
+                    <h5 class="fw-semibold mb-3">Powerful Search</h5>
+                    <p class="text-muted small">
+                        Quickly find passages, notes, and records with our 
+                        advanced search functionality.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card p-4">
+                    <div class="feature-icon mb-4">
+                        <i class="bi bi-journal-text"></i>
+                    </div>
+                    <h5 class="fw-semibold mb-3">Study Records</h5>
+                    <p class="text-muted small">
+                        Create detailed study records with attached scriptures. 
+                        Build your personal study library.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card p-4">
+                    <div class="feature-icon mb-4">
+                        <i class="bi bi-robot"></i>
+                    </div>
+                    <h5 class="fw-semibold mb-3">AI Assistant</h5>
+                    <p class="text-muted small">
+                        Get insights and study suggestions with our AI-powered 
+                        study assistant (coming soon).
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 mb-3">
+                    <i class="bi bi-play-circle me-1"></i> How It Works
+                </span>
+                <h2 class="display-5 fw-bold mb-3">Start Your Journey in</h2>
+                <h2 class="display-5 fw-bold gradient-text mb-4">Three Simple Steps</h2>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="step-card text-center p-4">
+                    <div class="step-number mx-auto mb-4">1</div>
+                    <h5 class="fw-semibold mb-3">Create an Account</h5>
+                    <p class="text-muted small">
+                        Sign up for free and get instant access to all basic features.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="step-card text-center p-4">
+                    <div class="step-number mx-auto mb-4">2</div>
+                    <h5 class="fw-semibold mb-3">Choose a Version</h5>
+                    <p class="text-muted small">
+                        Select from 50+ Bible translations to start reading.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="step-card text-center p-4">
+                    <div class="step-number mx-auto mb-4">3</div>
+                    <h5 class="fw-semibold mb-3">Study & Save</h5>
+                    <p class="text-muted small">
+                        Read, take notes, and save passages to your records.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials-section py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 mb-3">
+                    <i class="bi bi-chat-quote me-1"></i> Testimonials
+                </span>
+                <h2 class="display-5 fw-bold mb-3">What Our Users Are</h2>
+                <h2 class="display-5 fw-bold gradient-text mb-4">Saying About Stuble</h2>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="testimonial-card p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="avatar-placeholder me-3">
+                            <i class="bi bi-person-circle fs-1 text-primary"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-semibold mb-1">Sarah Johnson</h6>
+                            <p class="text-muted small mb-0">Bible Study Leader</p>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-3">
+                        "Stuble has transformed how I prepare for Bible study. 
+                        The ability to save passages and take notes in one place is invaluable."
+                    </p>
+                    <div class="text-warning">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="testimonial-card p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="avatar-placeholder me-3">
+                            <i class="bi bi-person-circle fs-1 text-primary"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-semibold mb-1">Pastor Michael</h6>
+                            <p class="text-muted small mb-0">Church Pastor</p>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-3">
+                        "I recommend Stuble to everyone in my congregation. 
+                        It's the perfect tool for personal devotions and sermon preparation."
+                    </p>
+                    <div class="text-warning">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="testimonial-card p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="avatar-placeholder me-3">
+                            <i class="bi bi-person-circle fs-1 text-primary"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-semibold mb-1">David Chen</h6>
+                            <p class="text-muted small mb-0">Seminary Student</p>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-3">
+                        "The multiple version comparison feature is a game-changer for my studies. 
+                        I can easily track passages across different translations."
+                    </p>
+                    <div class="text-warning">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section py-5">
+    <div class="container">
+        <div class="cta-card p-5 text-center">
+            {% if request.user.is_authenticated %}
+                <!-- Content for Logged-in Users -->
+                <h2 class="display-5 fw-bold text-white mb-4">Continue Your Study Journey</h2>
+                <p class="text-white-50 mb-5" style="max-width: 600px; margin-left: auto; margin-right: auto;">
+                    Pick up where you left off or explore new passages in your personal study library.
+                </p>
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                    <a href="{% url 'bible' %}" class="btn btn-light btn-lg px-5 py-3 rounded-3">
+                        <i class="bi bi-book-half me-2"></i>Read Bible
+                    </a>
+                    <a href="{% url 'user_records' %}" class="btn btn-outline-light btn-lg px-5 py-3 rounded-3">
+                        <i class="bi bi-files me-2"></i>My Records
+                    </a>
+                    <a href="{% url 'create_record' %}" class="btn btn-outline-light btn-lg px-5 py-3 rounded-3">
+                        <i class="bi bi-plus-circle me-2"></i>New Record
+                    </a>
+                </div>
+            {% else %}
+                <!-- Content for Logged-out Users -->
+                <h2 class="display-5 fw-bold text-white mb-4">Ready to Deepen Your Study?</h2>
+                <p class="text-white-50 mb-5" style="max-width: 600px; margin-left: auto; margin-right: auto;">
+                    Join thousands of users who are already using Stuble to enhance their Bible study experience.
+                </p>
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                    <a href="#" class="btn btn-light btn-lg px-5 py-3 rounded-3">
+                        <i class="bi bi-person-plus me-2"></i>Sign Up Free
+                    </a>
+                    <a href="#" class="btn btn-outline-light btn-lg px-5 py-3 rounded-3">
+                        <i class="bi bi-book me-2"></i>Try Demo
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Hero Section */
+    .hero-section {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .gradient-text {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    /* Hero Card */
+    .hero-card {
+        background: white;
+        border-radius: 30px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        margin: 0 auto;
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    .passage-preview {
+        background: #f8fafc;
+        border-radius: 20px;
+        padding: 1.5rem;
+    }
+    
+    .verse-text {
+        font-family: 'Georgia', serif;
+        color: #2d3748;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+    
+    .verse-number {
+        color: #667eea;
+        font-weight: 600;
+        margin-right: 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    /* Floating Cards */
+    .floating-card {
+        position: absolute;
+        background: white;
+        padding: 0.75rem 1.25rem;
+        border-radius: 50px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+        font-weight: 500;
+        animation: float 4s ease-in-out infinite;
+    }
+    
+    .notes-card {
+        bottom: 10%;
+        left: -10%;
+        animation-delay: 0.5s;
+    }
+    
+    .floating-bookmark-card {
+        position: absolute;
+        top: 20%;
+        right: -5%;
+        background: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        animation: float 4s ease-in-out infinite;
+        animation-delay: 1s;
+    }
+    
+    /* Features Section */
+    .features-section {
+        background: white;
+    }
+    
+    .feature-card {
+        background: #f8fafc;
+        border-radius: 24px;
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.1);
+    }
+    
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .feature-icon i {
+        font-size: 1.8rem;
+        color: white;
+    }
+    
+    /* How It Works */
+    .how-it-works {
+        background: #f8fafc;
+    }
+    
+    .step-card {
+        background: white;
+        border-radius: 24px;
+        height: 100%;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .step-number {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.5rem;
+    }
+    
+    /* Testimonials */
+    .testimonials-section {
+        background: white;
+    }
+    
+    .testimonial-card {
+        background: #f8fafc;
+        border-radius: 24px;
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+    
+    .testimonial-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.1);
+    }
+    
+    /* CTA Section */
+    .cta-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .cta-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 30px;
+    }
+    
+    .btn-light {
+        background: white;
+        border: none;
+        color: #667eea;
+        font-weight: 600;
+    }
+    
+    .btn-light:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-outline-light {
+        border: 2px solid white;
+        color: white;
+        font-weight: 600;
+    }
+    
+    .btn-outline-light:hover {
+        background: white;
+        color: #667eea;
+        transform: translateY(-2px);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .display-3 {
+            font-size: 2.5rem;
+        }
+        
+        .display-5 {
+            font-size: 2rem;
+        }
+        
+        .floating-card {
+            display: none;
+        }
+        
+        .floating-bookmark-card {
+            display: none;
+        }
+        
+        .hero-card {
+            max-width: 100%;
+        }
+    }
+</style>
+{% endblock %}

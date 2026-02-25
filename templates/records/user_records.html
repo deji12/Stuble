@@ -1,16 +1,66 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% load static %}
+<link rel="stylesheet" src="{% static 'css/records.css' %}">
 
 <div class="container py-5">
     <!-- Header Section with better spacing -->
-    <div class="row mb-5">
+    <div class="row mb-4">
         <div class="col-12">
             <h2 class="display-5 fw-bold text-primary mb-3">Records</h2>
             <p class="text-muted">Browse through your collection of records</p>
             <hr class="opacity-25">
         </div>
     </div>
+
+    <!-- Search Bar Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-light">
+                <div class="card-body">
+                    <form method="GET" action="{% url 'user_records' %}" class="row g-3 align-items-end">
+                        <!-- Search Input -->
+                        <div class="col-12 col-md-8 col-lg-9">
+                            <label for="search" class="form-label fw-semibold text-secondary small text-uppercase tracking-wide">
+                                <i class="bi bi-search me-1"></i>Search Records
+                            </label>
+                            <div class="input-group">
+                                <input type="text" class="form-control form-control-lg rounded-3 border-0" 
+                                       id="search" name="q" placeholder="Search by title..." 
+                                       value="{{ request.GET.q }}" style="background: white;">
+                                <button class="btn btn-primary rounded-3 px-4" type="submit">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Clear Filter Button (shows only when searching) -->
+                        {% if request.GET.q %}
+                            <div class="col-12 col-md-4 col-lg-3">
+                                <label class="form-label d-none d-md-block">&nbsp;</label>
+                                <a href="{% url 'user_records' %}" class="btn btn-outline-secondary w-100 rounded-3 py-3">
+                                    <i class="bi bi-x-circle me-2"></i>Clear Search
+                                </a>
+                            </div>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Count (shows when searching) -->
+    {% if request.GET.q %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <p class="text-muted">
+                    <i class="bi bi-files me-2"></i>
+                    Found <strong>{{ records.count }}</strong> record{{ records.count|pluralize }} matching "{{ request.GET.q }}"
+                </p>
+            </div>
+        </div>
+    {% endif %}
 
     <!-- Cards Grid with improved styling -->
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
@@ -32,8 +82,14 @@
 
                     <!-- Card Body -->
                     <div class="card-body p-4">
-                        <h5 class="card-title fw-semibold mb-3">{{record.title}}</h5>
-                        <p class="card-text text-secondary">{{record.note.plain|truncatechars:30}}</p>
+                        <h5 class="card-title fw-semibold mb-3">
+                            {% if request.GET.q %}
+                                {{ record.title|truncatechars:50 }}
+                            {% else %}
+                                {{ record.title }}
+                            {% endif %}
+                        </h5>
+                        <p class="card-text text-secondary">{{ record.note.plain|truncatechars:30 }}</p>
                     </div>
 
                     <!-- Meta Information -->
@@ -41,11 +97,11 @@
                         <div class="d-flex flex-column gap-2">
                             <div class="d-flex align-items-center text-muted small">
                                 <i class="bi bi-calendar3 me-2"></i>
-                                <span>Created: {{record.created_at}}</span>
+                                <span>Created: {{record.created_at|date:"M d, Y"}}</span>
                             </div>
                             <div class="d-flex align-items-center text-muted small">
                                 <i class="bi bi-clock-history me-2"></i>
-                                <span>Updated: {{record.last_updated_at}}</span>
+                                <span>Updated: {{record.last_updated_at|date:"M d, Y"}}</span>
                             </div>
                         </div>
                     </div>
@@ -64,52 +120,25 @@
             <!-- Empty State -->
             <div class="col-12">
                 <div class="text-center py-5">
-                    <i class="bi bi-files fs-1 text-muted mb-3"></i>
-                    <h3 class="h4 fw-semibold mb-2">No Records Found</h3>
-                    <p class="text-muted mb-4">You haven't created any records yet.</p>
-                    <a href="#" class="btn btn-primary rounded-pill px-4">
-                        <i class="bi bi-plus-circle me-2"></i>Create New Record
-                    </a>
+                    {% if request.GET.q %}
+                        <i class="bi bi-search fs-1 text-muted mb-3"></i>
+                        <h3 class="h4 fw-semibold mb-2">No Matching Records</h3>
+                        <p class="text-muted mb-4">No records found matching "{{ request.GET.q }}"</p>
+                        <a href="{% url 'user_records' %}" class="btn btn-outline-primary rounded-pill px-4">
+                            <i class="bi bi-arrow-left me-2"></i>Clear Search
+                        </a>
+                    {% else %}
+                        <i class="bi bi-files fs-1 text-muted mb-3"></i>
+                        <h3 class="h4 fw-semibold mb-2">No Records Found</h3>
+                        <p class="text-muted mb-4">You haven't created any records yet.</p>
+                        <a href="{% url 'create_record' %}" class="btn btn-primary rounded-pill px-4">
+                            <i class="bi bi-plus-circle me-2"></i>Create New Record
+                        </a>
+                    {% endif %}
                 </div>
             </div>
         {% endfor %}
     </div>
 </div>
-
-<!-- Custom CSS for animations and effects -->
-<style>
-    .hover-lift {
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    }
-    
-    .hover-lift:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
-    }
-    
-    .transition {
-        transition: all 0.3s ease;
-    }
-    
-    .card {
-        border: none;
-        background: white;
-        overflow: hidden;
-    }
-    
-    .badge {
-        font-weight: 500;
-        font-size: 0.75rem;
-    }
-    
-    .btn-outline-primary {
-        border-width: 2px;
-    }
-    
-    .btn-outline-primary:hover {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-color: transparent;
-    }
-</style>
 
 {% endblock content %}
