@@ -3,8 +3,12 @@ from .models import WaitingList
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.conf import settings
+import logging
+from stuble.celery import app
 
-@shared_task
+logger = logging.getLogger(__name__)
+
+@app.task(name='send_bulk_emails')
 def send_bulk_emails(
         subject, 
         message, 
@@ -12,6 +16,8 @@ def send_bulk_emails(
         button_text=None, 
         button_url=None
     ):
+
+    logger.info("send_bulk_emails STARTED")
     
     recipients = WaitingList.objects.values_list('email', flat=True)
     # recipients = ['ptutsi@proton.me', 'theprotonguy@yahoo.com']
@@ -36,4 +42,5 @@ def send_bulk_emails(
     email.content_subtype = 'html'
     email.send()
 
-    return f"Sent out {recipients.count} emails"
+    logger.info("send_bulk_emails FINISHED")
+    return f"Sent out {recipients.count()} emails"
