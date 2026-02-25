@@ -110,7 +110,6 @@ else:
     CELERY_TIMEZONE = "Africa/Lagos"
     CELERY_ENABLE_UTC = False
     CELERY_RESULT_EXTENDED = True
-    CELERY_RESULT_BACKEND = 'django-db'
 
 
     CELERY_TASK_TRACK_STARTED = True
