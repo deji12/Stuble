@@ -120,6 +120,7 @@ class Collection(models.Model):
 class WaitingList(models.Model):
     
     email = models.EmailField()
+    created_when = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     def __str__(self):
         return self.email

@@ -9,13 +9,18 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .models import User, PasswordResetCode, Record, RecordPassage, RecordImage, WaitingList
 from django.contrib import messages
-from .utils import is_valid_email
+from .utils import is_valid_email, superuser_required
 from django.urls import reverse
-from .forms import RecordNoteForm
+from .forms import RecordNoteForm, EmailForm
 from django.contrib.auth import update_session_auth_hash
+from .tasks import send_bulk_emails
 
 API_BIBLE_BASE_URL = "https://rest.api.bible/v1"
 
+
+# ----------------------------------------------------------------
+#                     LANDING PAGE & BIBLE
+#-----------------------------------------------------------------
 
 def landing(request):
     return render(request, 'index.html')
@@ -42,25 +47,6 @@ def bible(request):
         "bible_versions": versions
     }
     return render(request, "bible/bible.html", context)
-
-def waiting_list(request):
-
-    if request.method == 'POST':
-        email = request.POST.get('email')
-
-        if not email:
-            messages.error(request, "Email field is required")
-            return redirect('waiting_list')
-        
-        email, created = WaitingList.objects.get_or_create(email=email)
-        if created:
-            messages.success(request, 'Your email has been added to our waiting list')
-        else:
-            messages.success(request, 'You already joined the waiting list')
-        return redirect('wait_list')
-
-
-    return render(request, 'waiting_list.html')
 
 @require_GET
 def get_chapter_passage(request):
@@ -98,6 +84,64 @@ def get_chapter_passage(request):
         )
 
     return JsonResponse(response.json(), safe=False)
+
+
+
+
+# ----------------------------------------------------------------
+#                       WAITING LIST & MAILING
+#-----------------------------------------------------------------
+
+def waiting_list(request):
+
+    if request.method == 'POST':
+        email = request.POST.get('email')
+
+        if not email:
+            messages.error(request, "Email field is required")
+            return redirect('waiting_list')
+        
+        email, created = WaitingList.objects.get_or_create(email=email)
+        if created:
+            messages.success(request, 'Your email has been added to our waiting list')
+        else:
+            messages.success(request, 'You already joined the waiting list')
+        return redirect('wait_list')
+
+
+    return render(request, 'waiting_list.html')
+
+@superuser_required
+def send_out_bulk_email(request):
+
+    if request.method == "POST":    
+        form = EmailForm(request.POST)
+        if form.is_valid():
+            subject = form.cleaned_data['subject']
+            message = form.cleaned_data['message']
+            image = form.cleaned_data['image']
+            button_text = form.cleaned_data['button_text']
+            button_url = form.cleaned_data['button_url']
+
+            # Prepare and send emails
+            send_bulk_emails.delay(
+                subject = subject, 
+                message = message, 
+                image_url = image if image else None, 
+                button_text = button_text if button_text else None, 
+                button_url = button_url if button_url else None
+            )
+                
+
+            messages.success(request, "Emails sent out successfully")
+            return redirect('/admin/core/waitinglist/')
+        else:
+            messages.error(request, "Invalid form input")  # Log the errors
+            return redirect('/admin/core/waitinglist/')
+
+
+
+
 
 
 # ----------------------------------------------------------------
@@ -343,6 +387,10 @@ def delete_account(request):
         return redirect('register_user')
     return redirect('edit_account')
 
+
+
+
+
 # ----------------------------------------------------------------
 #                       RECORDS
 #-----------------------------------------------------------------
@@ -400,8 +448,6 @@ def create_record(request):
         "bible_versions": versions
     }
     return render(request, 'records/create_record.html', context)
-
-from django.db.models import Q
 
 @login_required
 def user_records(request):
@@ -504,7 +550,6 @@ def edit_record(request, record_id):
     }
     return render(request, 'records/edit_record.html', context)
     
-
 @login_required
 def delete_record(request, record_id):
 
@@ -522,6 +567,14 @@ def delete_record(request, record_id):
         messages.error(request, 'Record does not exist')
         
     return redirect('user_records')
+
+
+
+
+
+# ----------------------------------------------------------------
+#                       COLLECTION
+#-----------------------------------------------------------------
 
 @login_required
 def collections(request):

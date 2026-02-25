@@ -1,6 +1,9 @@
 from django.urls import path
 from .views import (
 
+    #admin
+    send_out_bulk_email,
+
     # waiting list
     waiting_list,
     
@@ -47,4 +50,7 @@ urlpatterns = [
     path('records/<int:record_id>/', user_record, name='user_record'),
     path('records/<int:record_id>/edit/', edit_record, name='edit_record'),
     path('records/<int:record_id>/delete/', delete_record, name='delete_record'),
+
+    # admin
+    path('send-bulk-emails/', send_out_bulk_email, name='send_bulk_email'),
 ]

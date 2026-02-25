@@ -33,6 +33,7 @@ CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS').split(',')
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,6 +44,8 @@ INSTALLED_APPS = [
     'django_quill',
     'cloudinary',
     'cloudinary_storage',
+    'import_export',
+    'django_ckeditor_5',
 ]
 
 MIDDLEWARE = [
@@ -98,6 +101,57 @@ else:
         }
     }
 
+    CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+    CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+    CELERY_RESULT_BACKEND = 'rpc://'  # For RabbitMQ
+    CELERY_ACCEPT_CONTENT = ['json']
+    CELERY_TASK_SERIALIZER = 'json'
+    CELERY_RESULT_SERIALIZER = 'json'
+    CELERY_TIMEZONE = "Africa/Lagos"
+    CELERY_ENABLE_UTC = False
+    CELERY_RESULT_EXTENDED = True
+    CELERY_RESULT_BACKEND = 'django-db'
+
+
+    CELERY_TASK_TRACK_STARTED = True
+    CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+
+        'handlers': {
+            # Daily debug/info logs
+            'debug_file': {
+                'level': 'DEBUG',
+                'class': 'logging.handlers.TimedRotatingFileHandler',
+                'filename': BASE_DIR / 'logs/debug.log',
+                'when': 'midnight',
+                'interval': 1,
+                'backupCount': 14,   # keep last 14 days
+                'encoding': 'utf-8',
+            },
+
+            # Daily error logs
+            'error_file': {
+                'level': 'ERROR',
+                'class': 'logging.handlers.TimedRotatingFileHandler',
+                'filename': BASE_DIR / 'logs/error.log',
+                'when': 'midnight',
+                'interval': 1,
+                'backupCount': 30,   # keep last 30 days
+                'encoding': 'utf-8',
+            },
+        },
+
+        'loggers': {
+            'django': {
+                'handlers': ['debug_file', 'error_file'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
+        },
+    }
 
 
 # Password validation
@@ -124,7 +178,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Lagos'
 
 USE_I18N = True
 
@@ -188,3 +242,185 @@ QUILL_CONFIGS = {
     }
     
 }
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": True,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": False,
+    "accent": "accent-olive",
+    "navbar": "navbar-white navbar-light",
+    "no_navbar_border": False,
+    "navbar_fixed": True,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": False,
+    "sidebar": "sidebar-dark-primary",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "default",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-outline-primary",
+        "secondary": "btn-outline-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    },
+    "actions_sticky_top": False
+}
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Stuble",
+    "site_header": "Stuble Admin",
+    "site_brand": "Stuble",
+    "copyright": "Stuble",
+
+    "show_ui_builder": False,
+
+    # Top menu apps
+    "topmenu_links": [
+        {"app": "core"},
+    ],
+
+    # Sidebar icons
+    "icons": {
+        # =========================
+        # ADMIN / DJANGO CORE
+        # =========================
+        "admin": "fas fa-shield-alt",
+        "admin.LogEntry": "fas fa-clipboard-list",
+
+        "auth": "fas fa-users-cog",
+        "auth.Permission": "fas fa-key",
+        "auth.Group": "fas fa-users",
+        
+        # =========================
+        # CORE APP MODELS (YOUR MODELS)
+        # =========================
+        # User model
+        "core.User": "fas fa-user-circle",
+        
+        # Record models
+        "core.Record": "fas fa-book-open",
+        "core.RecordPassage": "fas fa-bible",
+        "core.RecordImage": "fas fa-image",
+        
+        # Collection model
+        "core.Collection": "fas fa-layer-group",
+        
+        # Waiting List
+        "core.WaitingList": "fas fa-clock",
+        
+        # Password Reset
+        "core.PasswordResetCode": "fas fa-key",
+    },
+
+    # Defaults
+    "default_icon_parents": "fas fa-folder",
+    "default_icon_children": "fas fa-circle",
+}
+
+customColorPalette = [
+        {
+            'color': 'hsl(4, 90%, 58%)',
+            'label': 'Red'
+        },
+        {
+            'color': 'hsl(340, 82%, 52%)',
+            'label': 'Pink'
+        },
+        {
+            'color': 'hsl(291, 64%, 42%)',
+            'label': 'Purple'
+        },
+        {
+            'color': 'hsl(262, 52%, 47%)',
+            'label': 'Deep Purple'
+        },
+        {
+            'color': 'hsl(231, 48%, 48%)',
+            'label': 'Indigo'
+        },
+        {
+            'color': 'hsl(207, 90%, 54%)',
+            'label': 'Blue'
+        },
+    ]
+
+CKEDITOR_5_CONFIGS = {
+    'default': {
+        'toolbar': ['heading', '|', 'bold', 'italic', 'link',
+                    'bulletedList', 'numberedList', 'blockQuote', 'imageUpload', ],
+
+    },
+    'extends': {
+        'blockToolbar': [
+            'paragraph', 'heading1', 'heading2', 'heading3',
+            '|',
+            'bulletedList', 'numberedList',
+            '|',
+            'blockQuote',
+        ],
+        'toolbar': ['heading', '|', 'outdent', 'indent', '|', 'bold', 'italic', 'link', 'underline', 'strikethrough',
+        'code','subscript', 'superscript', 'highlight', '|', 'codeBlock', 'sourceEditing', 'insertImage',
+                    'bulletedList', 'numberedList', 'todoList', '|',  'blockQuote', 'imageUpload', '|',
+                    'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'mediaEmbed', 'removeFormat',
+                    'insertTable',],
+        'image': {
+            'toolbar': ['imageTextAlternative', '|', 'imageStyle:alignLeft',
+                        'imageStyle:alignRight', 'imageStyle:alignCenter', 'imageStyle:side',  '|'],
+            'styles': [
+                'full',
+                'side',
+                'alignLeft',
+                'alignRight',
+                'alignCenter',
+            ]
+
+        },
+        'table': {
+            'contentToolbar': [ 'tableColumn', 'tableRow', 'mergeTableCells',
+            'tableProperties', 'tableCellProperties' ],
+            'tableProperties': {
+                'borderColors': customColorPalette,
+                'backgroundColors': customColorPalette
+            },
+            'tableCellProperties': {
+                'borderColors': customColorPalette,
+                'backgroundColors': customColorPalette
+            }
+        },
+        'heading' : {
+            'options': [
+                { 'model': 'paragraph', 'title': 'Paragraph', 'class': 'ck-heading_paragraph' },
+                { 'model': 'heading1', 'view': 'h1', 'title': 'Heading 1', 'class': 'ck-heading_heading1' },
+                { 'model': 'heading2', 'view': 'h2', 'title': 'Heading 2', 'class': 'ck-heading_heading2' },
+                { 'model': 'heading3', 'view': 'h3', 'title': 'Heading 3', 'class': 'ck-heading_heading3' }
+            ]
+        }
+    },
+    'list': {
+        'properties': {
+            'styles': 'true',
+            'startIndex': 'true',
+            'reversed': 'true',
+        }
+    }
+}
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT', cast=int)
+EMAIL_USE_SSL = config('EMAIL_USE_SSL', cast=bool)
+# EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Stuble <adesolaayodeji53@gmail.com>')
