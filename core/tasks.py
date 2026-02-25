@@ -13,8 +13,8 @@ def send_bulk_emails(
         button_url=None
     ):
     
-    # recipients = WaitingList.objects.values_list('email', flat=True)
-    recipients = ['ptutsi@proton.me', 'theprotonguy@yahoo.com']
+    recipients = WaitingList.objects.values_list('email', flat=True)
+    # recipients = ['ptutsi@proton.me', 'theprotonguy@yahoo.com']
 
     email_template = 'admin/mass_email_template.html'
     email_data = {
@@ -35,3 +35,5 @@ def send_bulk_emails(
     email.fail_silently = True
     email.content_subtype = 'html'
     email.send()
+
+    return f"Sent out {recipients.count} emails"
