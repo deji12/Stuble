@@ -1,61 +1,165 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% load static %}
+<!-- Enhanced CSS for better styling -->
+<link rel="stylesheet" href="{% static 'css/bible.css' %}">
 
-<div class="container full-height d-flex flex-column justify-content-center align-items-center">
-        
-    <p class="h2">Bible</p>
-    <div class="form-container">
-        <form method="POST" id="search-form">
-            <div class="mb-3 mt-3 row g-2 align-items-end">
-                <div class="col-auto">
-                    <label for="version" class="form-label">Version:</label>
-                    <select class="form-control form-select" id="version" name="version" style="min-width: 120px;">
-                        <option value="" disabled selected>Select Version</option>
-                        {% for version in bible_versions %}
-                            <option value="{{version.id}}">({{version.abbreviationLocal}}) {{version.name}}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <input type="text" class="form-control" id="record-form" value="no" hidden>
-                <div class="col-auto">
-                    <label for="book" class="form-label">Book:</label>
-                    <select class="form-control form-select" id="book" name="book" style="min-width: 120px;">
-                        <option value="" disabled selected>Select Book</option>
-                        {% for book in books %}
-                            <option value="{{book.id}}" >{{book.name}}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                {{ books|json_script:"books-data" }}
-                <div class="col-auto">
-                    <label for="chapter" class="form-label">Chapter:</label>
-                    <select class="form-control form-select" id="chapter" name="chapter" style="min-width: 120px;">
-                        <option value="" disabled selected>Select Chapter</option>
+<div class="container py-5">
+    <!-- Header Section with improved styling -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="display-5 fw-bold text-primary mb-3">
+                <i class="bi bi-book-half me-2"></i>Holy Bible
+            </h2>
+            <p class="text-muted">Search and read scripture from multiple translations</p>
+            <hr class="opacity-25">
+        </div>
+    </div>
 
-                    </select>
-                </div>
+    <!-- Search Card with modern design -->
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+            <div class="card border-0 shadow-lg rounded-4 p-4 mb-5">
+                <div class="card-body">
+                    <!-- Card Header with icon -->
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
+                            <i class="bi bi-search-heart fs-4 text-primary"></i>
+                        </div>
+                        <div>
+                            <h3 class="h5 fw-semibold mb-1">Scripture Search</h3>
+                            <p class="text-muted small mb-0">Select a passage to read</p>
+                        </div>
+                    </div>
 
-                <div class="col-auto">
-                    <label for="verse" class="form-label">Verse:</label>
-                    <select class="form-control form-select" id="verse" name="verse" style="min-width: 120px;">
-                        <option value="" disabled selected>Select Verse</option>
-                    </select>
-                </div>
+                    <!-- Form with improved layout -->
+                    <form method="POST" id="search-form">
+                        {% csrf_token %}
+                        <div class="row g-4">
+                            
+                            <!-- Version Selection -->
+                            <div class="col-12 col-md-6 col-lg-3">
+                                <label for="version" class="form-label fw-semibold text-secondary small text-uppercase tracking-wide">
+                                    <i class="bi bi-translate me-1"></i>Version
+                                </label>
+                                <select class="form-select form-select-lg rounded-3 border-0 bg-light" 
+                                        id="version" 
+                                        name="version" 
+                                        required>
+                                    <option value="" disabled selected>Select Version</option>
+                                    {% for version in bible_versions %}
+                                        <option value="{{version.id}}">({{version.abbreviationLocal}}) {{version.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
 
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-outline-primary mt-4" id="search-btn">Read</button>
+                            <!-- Hidden Input -->
+                            <input type="text" class="form-control" id="record-form" value="no" hidden>
+
+                            <!-- Book Selection -->
+                            <div class="col-12 col-md-6 col-lg-3">
+                                <label for="book" class="form-label fw-semibold text-secondary small text-uppercase tracking-wide">
+                                    <i class="bi bi-book me-1"></i>Book
+                                </label>
+                                <select class="form-select form-select-lg rounded-3 border-0 bg-light" 
+                                        id="book" 
+                                        name="book" 
+                                        required>
+                                    <option value="" disabled selected>Select Book</option>
+                                    {% for book in books %}
+                                        <option value="{{book.id}}">{{book.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            {{ books|json_script:"books-data" }}
+
+                            <!-- Chapter Selection -->
+                            <div class="col-12 col-md-6 col-lg-2">
+                                <label for="chapter" class="form-label fw-semibold text-secondary small text-uppercase tracking-wide">
+                                    <i class="bi bi-hash me-1"></i>Chapter
+                                </label>
+                                <select class="form-select form-select-lg rounded-3 border-0 bg-light" 
+                                        id="chapter" 
+                                        name="chapter" 
+                                        required>
+                                    <option value="" disabled selected>Select</option>
+                                </select>
+                            </div>
+
+                            <!-- Verse Selection -->
+                            <div class="col-12 col-md-6 col-lg-2">
+                                <label for="verse" class="form-label fw-semibold text-secondary small text-uppercase tracking-wide">
+                                    <i class="bi bi-pencil me-1"></i>Verse
+                                </label>
+                                <select class="form-select form-select-lg rounded-3 border-0 bg-light" 
+                                        id="verse" 
+                                        name="verse">
+                                    <option value="" disabled selected>All</option>
+                                </select>
+                            </div>
+
+                            <!-- Search Button -->
+                            <div class="col-12 col-lg-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary btn-lg w-100 rounded-3 d-flex align-items-center justify-content-center gap-2" 
+                                        id="search-btn">
+                                    <i class="bi bi-book-open"></i>
+                                    <span>Read</span>
+                                </button>
+                            </div>
+                            <button id="add-scripture-btn" style="display: none">
+                        </div>
+                    </form>
+
+                    <!-- Message Alerts with improved styling -->
+                    <div class="mt-4">
+                        <div id="register-error-message" class="alert alert-danger d-none align-items-center" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <span><b></b></span>
+                        </div>
+                        <div id="register-success-message" class="alert alert-success d-none align-items-center" role="alert">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            <span><b></b></span>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </form>
-        <center>
-            <p id="register-error-message" style="color:firebrick; display:none;"><b></b></p>
-            <p id="register-success-message" style="color:#155724; display:none;"><b></b></p>
-        </center>
+        </div>
     </div>
-    <div class="container passage" id="passage"></div>
+
+    <!-- Passage Display Section with modern card -->
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden" id="passage-card" style="display: none;">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
+                            <i class="bi bi-quote fs-4 text-primary"></i>
+                        </div>
+                        <div>
+                            <h4 class="h5 fw-semibold mb-1">Scripture Passage</h4>
+                            <p class="text-muted small mb-0" id="passage-reference"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="passage-content passage" id="passage">
+                        <!-- Dynamic content will be loaded here -->
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-0 pb-4 px-4">
+                    <button class="btn btn-outline-primary btn-sm rounded-pill" onclick="copyPassage()">
+                        <i class="bi bi-clipboard me-1"></i>Copy Passage
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-{% include 'bible/script_and_style.html' %}
+<!-- Additional JavaScript for enhanced functionality -->
+<script src="{% static 'js/bible.js' %}"></script>
+<script src="{% static 'js/scriptures.js' %}"></script>
 
 {% endblock content %}

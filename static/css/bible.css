@@ -1,0 +1,121 @@
+.tracking-wide {
+    letter-spacing: 0.025em;
+}
+
+.form-select-lg {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    font-size: 0.95rem;
+}
+
+.form-select:focus {
+    box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.1);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+.btn-outline-primary {
+    border-width: 2px;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: transparent;
+    transform: translateY(-1px);
+}
+
+.card {
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.bg-light {
+    background-color: #f8fafd !important;
+}
+
+.alert {
+    border: none;
+    border-radius: 1rem;
+    padding: 1rem 1.25rem;
+}
+
+.alert-danger {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.alert-success {
+    background-color: #dcfce7;
+    color: #16a34a;
+}
+
+/* Passage content styling */
+.passage-content {
+    font-family: 'Georgia', serif;
+    line-height: 1.8;
+    color: #2d3748;
+}
+
+.passage-content p {
+    margin-bottom: 1rem;
+}
+
+.passage-content .verse-number {
+    color: #667eea;
+    font-weight: 600;
+    margin-right: 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Animation for card appearance */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#passage-card {
+    animation: fadeInUp 0.5s ease forwards;
+}
+.passage {
+    max-width: 720px;
+    margin: 40px auto;
+    font-family: "Georgia", serif;
+    line-height: 1.8;
+    font-size: 18px;
+    color: #222;
+}
+
+.passage p.p {
+    margin-bottom: 1.2em;
+}
+
+.passage span.v {
+    font-weight: bold;
+    font-size: 0.85em;
+    vertical-align: super;
+    color: #555;
+    margin-right: 4px;
+}
+
+.passage span.add {
+    font-style: italic;
+    opacity: 0.8;
+}

@@ -9,16 +9,16 @@
     <div class="row mb-5">
         <div class="col-12 text-center">
             <h2 class="display-5 fw-bold text-primary mb-3">
-                <i class="bi bi-pencil-square me-2"></i>Create Record
+                <i class="bi bi-pencil-square me-2"></i>Edit Record
             </h2>
-            <p class="text-muted">Document your insights and scripture reflections</p>
+            <p class="text-muted">Update your insights and scripture reflections</p>
             <hr class="opacity-25 w-25 mx-auto">
         </div>
     </div>
 
     <div class="row g-4" id="record-layout">
         <!-- FORM COLUMN -->
-        <div class="col-12" id="form-column">
+        <div class="{% if passages %}col-12 col-lg-6{% else %}col-12{% endif %}" id="form-column">
             <div class="card border-0 shadow-lg rounded-4 p-4">
                 <div class="card-body">
                     <!-- Form Header -->
@@ -27,8 +27,8 @@
                             <i class="bi bi-journal-text fs-4 text-primary"></i>
                         </div>
                         <div>
-                            <h3 class="h5 fw-semibold mb-1">Record Details</h3>
-                            <p class="text-muted small mb-0">Fill in your study notes</p>
+                            <h3 class="h5 fw-semibold mb-1">Edit Record Details</h3>
+                            <p class="text-muted small mb-0">Update your study notes</p>
                         </div>
                     </div>
 
@@ -42,7 +42,8 @@
                                 <i class="bi bi-type me-1"></i>Title
                             </label>
                             <input type="text" class="form-control form-control-lg rounded-3 border-0 bg-light" 
-                                   name="title" placeholder="e.g., Morning Devotion, Psalm 23 Study" required>
+                                   name="title" placeholder="e.g., Morning Devotion, Psalm 23 Study" 
+                                   value="{{record.title}}" required>
                         </div>
 
                         <input type="text" id="record-form" value="yes" hidden>
@@ -57,6 +58,16 @@
                             </div>
                         </div>
 
+                        <!-- Existing Scripture Inputs (Hidden) -->
+                        {% for passage in passages %}
+                            <input 
+                                type="hidden" 
+                                name="scriptures[]" 
+                                id="form-scripture-{{passage.id}}" 
+                                value="{{passage.bible_id}}|{{passage.chapter_id}}|{{passage.verse_id}}|{{passage.content}}|{{passage.passage_formatted}}"    
+                            >
+                        {% endfor %}
+
                         <!-- Action Buttons -->
                         <div class="d-flex gap-3">
                             <button type="button" class="btn btn-outline-primary rounded-3 px-4 py-2" 
@@ -64,7 +75,7 @@
                                 <i class="bi bi-plus-circle me-2"></i>Add Scripture
                             </button>
                             <button type="submit" class="btn btn-primary rounded-3 px-4 py-2">
-                                <i class="bi bi-check-circle me-2"></i>Save Record
+                                <i class="bi bi-check-circle me-2"></i>Update Record
                             </button>
                         </div>
                     </form>
@@ -72,8 +83,8 @@
             </div>
         </div>
 
-        <!-- ACCORDION COLUMN (Scripture List) -->
-        <div class="col-12 col-lg-6 d-none" id="accordion-column">
+        <!-- ACCORDION COLUMN (Existing Scriptures) -->
+        <div class="col-12 col-lg-6 {% if not passages %}d-none{% endif %}" id="accordion-column">
             <div class="card border-0 shadow-lg rounded-4">
                 <div class="card-header bg-white border-0 pt-4 px-4">
                     <div class="d-flex align-items-center">
@@ -81,13 +92,37 @@
                             <i class="bi bi-bookmarks-fill fs-4 text-primary"></i>
                         </div>
                         <div>
-                            <h4 class="h5 fw-semibold mb-1">Added Scriptures</h4>
-                            <p class="text-muted small mb-0">Passages attached to this record</p>
+                            <h4 class="h5 fw-semibold mb-1">Attached Scriptures</h4>
+                            <p class="text-muted small mb-0">Passages in this record</p>
                         </div>
                     </div>
                 </div>
                 <div class="card-body p-4">
-                    <div class="accordion passage" id="accordionFlushExample"></div>
+                    <div class="accordion passage" id="accordionFlushExample">
+                        {% for passage in passages %}
+                            <div class="accordion-item" id="accordion-scripture-{{passage.id}}">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" 
+                                            data-bs-toggle="collapse" data-bs-target="#flush-collapse{{passage.id}}" 
+                                            aria-expanded="false" aria-controls="flush-collapse{{passage.id}}">
+                                        {{passage.passage_formatted|safe}}
+                                    </button>
+                                </h2>
+                                <div id="flush-collapse{{passage.id}}" class="accordion-collapse collapse" 
+                                     data-bs-parent="#accordionFlushExample">
+                                    <div class="accordion-body">
+                                        {{passage.content|safe}}
+                                        <div class="text-end mt-3">
+                                            <button type="button" onclick="deleteScripture({{passage.id}})" 
+                                                    class="btn btn-danger btn-sm rounded-pill px-3">
+                                                <i class="bi bi-trash3 me-1"></i>Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         </div>

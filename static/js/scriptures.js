@@ -1,0 +1,263 @@
+function deleteScripture(scripture_id) {
+    document.getElementById(`form-scripture-${scripture_id}`).remove();
+    document.getElementById(`accordion-scripture-${scripture_id}`).remove();
+
+    const accordion = document.querySelector('#accordionFlushExample');
+
+    if (accordion.children.length === 0) {
+        hideScriptureAccordion();
+    }
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    const bookSelect = document.getElementById('book');
+    const versionsSelect = document.getElementById("version");
+    const chapterSelect = document.getElementById('chapter');
+    const verseSelect = document.getElementById('verse');
+    const recordForm = document.getElementById('record-form');
+    const searchForm = document.getElementById('search-form');
+    const searchBtn = document.getElementById('search-btn');
+    const accordionBody = document.getElementById('accordionFlushExample');
+    const addScriptureBtn = document.getElementById('add-scripture-btn');
+    const createRecordForm = document.getElementById('add-record-form');
+
+    // store the selected book's data
+    let selectedBookName = null;
+    let selectedBookVersion = null;
+    let selectedBookChapter = null;
+    let passageData = null;
+    let numberOfScriptures = 0;
+    let displayedScripture = false;
+
+    const books = JSON.parse(
+        document.getElementById("books-data").textContent
+    );
+    
+    // Store the current book's chapters data
+    let currentBookChaptersData = null;
+    
+    // Handle book selection
+    bookSelect.addEventListener('change', function () {
+        chapterSelect.innerHTML = '<option disabled selected>Select Chapter</option>';
+        verseSelect.innerHTML = '<option disabled selected>Select Verse</option>';
+
+        const selectedBook = this.value.split(",")
+        const selectedBookId = selectedBook[0];
+
+        selectedBookName = selectedBook[1];
+
+        const book = books.find(b => b.id === selectedBookId);
+
+        if (!book) return;
+
+        currentBookChaptersData = Object.assign({}, ...book.chapters);
+
+        Object.entries(currentBookChaptersData).forEach(([chapter, verses]) => {
+            const option = document.createElement('option');
+            // option.value = chapter;
+            option.value = `${selectedBookId}.${chapter}`; 
+            option.textContent = `Chapter ${chapter}`;
+            chapterSelect.appendChild(option);
+        });
+    });
+
+    
+    // Handle chapter selection
+    chapterSelect.addEventListener('change', function() {
+        // Clear existing verse options
+        verseSelect.innerHTML = '<option value="" disabled selected>Select Verse</option>';
+        
+        const selectedChapter = this.value;
+        selectedBookChapter = selectedChapter
+        
+        if (selectedChapter && currentBookChaptersData) {
+            // Get the number of verses for this chapter
+            const chapter = parseInt(selectedChapter.split(".")[1])
+            const versesCount = currentBookChaptersData[chapter];
+            console.log(`Chapter ${chapter} has ${versesCount} verses`);
+            
+            if (versesCount) {
+                // Create verse options from 1 to total verses
+                for (let i = 1; i <= versesCount; i++) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = i;
+                    verseSelect.appendChild(option);
+                }
+            }
+        }
+    });
+
+    searchForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        
+        // Add loading class to button
+        searchBtn.classList.add('btn-loading');
+        searchBtn.disabled = true;
+        
+        let bibleId = versionsSelect.value;
+        if (bibleId === "") {
+            document.getElementById("passage").innerHTML = `<span style="color:red;"><b>Select a bible version</b></span>`;
+            // Re-enable button if validation fails
+            searchBtn.classList.remove('btn-loading');
+            searchBtn.disabled = false;
+            return;
+        }
+        
+        bibleId = bibleId.split(',')[0];  
+        const chapterId = chapterSelect.value;
+        const verseId = verseSelect.value;
+
+        if (bibleId && chapterId) {
+            loadChapter(bibleId, chapterId, verseId);
+        } else {
+            document.getElementById("passage").innerHTML = `<span style="color:red;"><b>Please select a book and chapter</b></span>`;
+            // Re-enable button if validation fails
+            searchBtn.classList.remove('btn-loading');
+            searchBtn.disabled = false;
+        }
+    });
+
+    async function loadChapter(bibleId, chapterId, verseId) {
+        // Show loading text
+        document.getElementById("passage").innerHTML = "<em>Loading...</em>";
+
+        let urlEndpoint = `/api/bible/passage/?bibleId=${bibleId}&chapterId=${chapterId}`
+        if (verseId) {
+            urlEndpoint += `&verseId=${verseId}`
+        }
+        
+        try {
+            const response = await fetch(urlEndpoint);
+
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+
+            // Render the actual passage content
+            document.getElementById("passage").innerHTML = data.data.content;
+            passageData = data;
+            
+            // Check if passage-card exists before trying to manipulate it
+            const passageCard = document.getElementById('passage-card');
+            if (passageCard) {
+                // Show the passage card
+                passageCard.style.display = 'block';
+                
+                // Scroll to the passage card smoothly
+                setTimeout(() => {
+                    passageCard.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center',
+                        inline: 'nearest'
+                    });
+                }, 100); // Small delay to ensure content is rendered
+            }
+            
+            // Update reference if you have an element for it
+            const referenceEl = document.getElementById('passage-reference');
+            if (referenceEl) {
+                const version = versionsSelect.options[versionsSelect.selectedIndex].text;
+                const book = bookSelect.options[bookSelect.selectedIndex].text;
+                const chapter = chapterSelect.options[chapterSelect.selectedIndex].text;
+                const verse = verseSelect.value ? `:${verseSelect.value}` : '';
+                referenceEl.textContent = `${version} - ${book} ${chapter}${verse}`;
+            }
+
+        } catch (error) {
+            // Show error message
+            document.getElementById("passage").innerHTML = `<span style="color:red;">Failed to load passage: ${error.message}</span>`;
+        } finally {
+            // ALWAYS re-enable the button - this runs whether success or error
+            searchBtn.classList.remove('btn-loading');
+            searchBtn.disabled = false;
+        }
+    }
+
+    function addPassage(data, passage) {
+        
+        const preparedPassage = `
+            <div class="accordion-item" id="accordion-scripture-${numberOfScriptures}">
+                <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse${numberOfScriptures}" aria-expanded="false" aria-controls="flush-collapse${numberOfScriptures}">
+                    ${passage}
+                </button>
+                </h2>
+                <div id="flush-collapse${numberOfScriptures}" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                    <div class="accordion-body">
+                        ${data.data.content}
+                        <button type="button" onclick="deleteScripture(${numberOfScriptures})" class="btn btn-danger">Remove</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        accordionBody.insertAdjacentHTML('afterbegin',preparedPassage);
+
+        if (document.querySelector('#accordionFlushExample').children.length > 0 && !displayedScripture) {
+            showScriptureAccordion();
+        }
+    };
+
+    addScriptureBtn.addEventListener('click', (e) => {
+        if (recordForm.value === "yes" && passageData !== null) {
+
+            const bibleVersion = versionsSelect.value.split(',');
+            const bibleVersionAbbrevation = bibleVersion[1];
+            const bibleVersionID = bibleVersion[0];
+
+            const biblePassageFormatted = `(<b>${bibleVersionAbbrevation}</b>) ${selectedBookName} ${selectedBookChapter.split('.')[1]}${verseSelect.value === "" ? "" : `:${verseSelect.value}`}`;
+
+            // console.log(`Bible id: ${bibleVersionID} | Chapter: ${selectedBookChapter} | Verse: ${verseSelect.value}`);
+            // create a new input elememt for scripture
+            // Create input element
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'scriptures[]';
+            input.id = `form-scripture-${numberOfScriptures}`;
+            input.value = `${bibleVersionID}|${selectedBookChapter}|${verseSelect.value}|${passageData.data.content}|${biblePassageFormatted}`;
+            // The browser automatically escapes the value when setting it this way
+
+            // Append to the form
+            createRecordForm.appendChild(input);
+
+            addPassage(passageData, biblePassageFormatted);
+            searchForm.reset();
+
+            // display success message in increment scriptures count
+            document.getElementById("passage").innerHTML = `<span style="color:#198754;"><b>Passage added successfully!</b></span>`;
+            numberOfScriptures++;
+        
+        } else {
+            document.getElementById("passage").innerHTML = `<span style="color:red;"><b>Select a passage to add to your record!</b></span>`;
+        }
+    })
+
+});
+
+function showScriptureAccordion() {
+    const formCol = document.getElementById('form-column');
+    const accordionCol = document.getElementById('accordion-column');
+
+    formCol.classList.remove('col-12');
+    formCol.classList.add('col-12', 'col-lg-6');
+    accordionCol.classList.remove('d-none');
+    
+    // Smooth scroll to accordion on mobile
+    if (window.innerWidth < 992) {
+        setTimeout(() => {
+            accordionCol.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+    }
+}
+
+function hideScriptureAccordion() {
+    const formCol = document.getElementById('form-column');
+    const accordionCol = document.getElementById('accordion-column');
+
+    formCol.classList.remove('col-lg-6');
+    formCol.classList.add('col-12');
+    accordionCol.classList.add('d-none');
+}
+// loadChapter("de4e12af7f28f599-02", "GEN.1");

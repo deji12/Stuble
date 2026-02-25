@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+<!-- Enhanced CSS for better styling -->
+<link rel="stylesheet" href="{% static 'css/bible.css' %}">
+<link rel="stylesheet" href="{% static 'css/record.css' %}">
+<div class="container-lg full-height mt-5">
+    
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div class="text-center flex-grow-1">
+            <h1 class="fw-bold mb-1">{{ record.title }}</h1>
+            <hr class="mx-auto" style="width: 80px;">
+        </div>
+
+        <!-- Actions -->
+        <div class="ms-3">
+            <a href="{% url 'edit_record' record.id %}"
+            class="btn btn-sm btn-outline-secondary me-2">
+                ✏️ Edit
+            </a>
+
+            <button class="btn btn-sm btn-outline-danger"
+                    data-bs-toggle="modal"
+                    data-bs-target="#deleteRecordModal">
+                🗑 Delete
+            </button>
+        </div>
+    </div>
+    
+
+    <div class="row">
+        <!-- Left: Write-up -->
+        <div class="col-12 col-lg-6 mb-4">
+            <div class="content-box p-4 bg-white rounded shadow-sm">
+                {{ record.note.html|safe }}
+            </div>
+        </div>
+
+        <!-- Right: Scriptures -->
+        <div class="col-12 col-lg-6">
+            <div class="p-4 bg-light rounded shadow-sm">
+                <h5 class="mb-3 text-muted">Scriptures</h5>
+                <div class="accordion passage" id="accordionFlushExample">
+                    {% for passage in passages %}
+                        <div class="accordion-item" id="accordion-scripture-{{ passage.id }}">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#flush-collapse{{ passage.id }}">
+                                    {{ passage.passage_formatted|safe }}
+                                </button>
+                            </h2>
+                            <div id="flush-collapse{{ passage.id }}"
+                                class="accordion-collapse collapse"
+                                data-bs-parent="#accordionFlushExample">
+                                <div class="accordion-body">
+                                    {{ passage.content|safe }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="modal fade" id="deleteRecordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <!-- Modal Header with gradient -->
+            <div class="modal-header bg-danger text-white border-0 rounded-top-4">
+                <div>
+                    <h5 class="modal-title fw-semibold">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Delete Record
+                    </h5>
+                    <small class="text-white-50">This action cannot be undone</small>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body p-4">
+                <div class="text-center mb-4">
+                    <!-- Warning Icon -->
+                    <div class="bg-danger bg-opacity-10 rounded-circle p-3 d-inline-flex mb-3">
+                        <i class="bi bi-trash3 fs-1 text-danger"></i>
+                    </div>
+                    
+                    <!-- Message -->
+                    <h6 class="fw-semibold mb-2">Are you absolutely sure?</h6>
+                    <p class="text-muted mb-0">
+                        You are about to delete <strong class="text-dark">"{{ record.title }}"</strong>
+                    </p>
+                    <p class="text-muted small mt-2">
+                        <i class="bi bi-info-circle me-1"></i>
+                        This will permanently remove this record and all its contents.
+                    </p>
+                </div>
+
+                <!-- Record Details Card (Optional - shows what's being deleted) -->
+                <div class="bg-light rounded-3 p-3 mb-3">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-danger bg-opacity-10 p-2 rounded-3 me-3">
+                            <i class="bi bi-journal-text text-danger"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="fw-semibold mb-1">{{ record.title }}</h6>
+                            <p class="text-muted small mb-0">
+                                <i class="bi bi-calendar3 me-1"></i>Created: {{ record.created_at|date:"M d, Y" }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                <button type="button" class="btn btn-outline-secondary rounded-3 px-4" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg me-2"></i>Cancel
+                </button>
+                <form method="GET" action="{% url 'delete_record' record.id %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger rounded-3 px-4" id="delete-record-btn">
+                        <i class="bi bi-trash3 me-2"></i>Delete Permanently
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/record.js' %}">
+{% endblock content %}

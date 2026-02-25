@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .books import books
 from .bible_versions import versions
 import requests
@@ -13,12 +13,23 @@ from .utils import is_valid_email
 from django.urls import reverse
 from .forms import RecordNoteForm
 
+
 API_BIBLE_BASE_URL = "https://rest.api.bible/v1"
 
 @login_required
 def home(request):
 
-    return render(request, 'home.html')
+    recent_records = Record.objects.filter(user=request.user, is_deleted=False).order_by('-id')[:5]
+    latest_passages = RecordPassage.objects.filter(
+        record__user=request.user,
+        record__is_deleted=False
+    ).order_by('-id')[:5]
+    
+    context = {
+        'recent_records': recent_records,
+        'recent_passages': latest_passages
+    }
+    return render(request, 'home.html', context)
 
 def bible(request):
 
@@ -246,6 +257,9 @@ def create_record(request):
         form = RecordNoteForm(request.POST)
         if form.is_valid():
             record_content = form.cleaned_data['note']
+        else:
+            messages.error(request, 'Invalid data entered')
+            return redirect('create_record')
 
         record = Record.objects.create(
             user = user,
@@ -261,20 +275,22 @@ def create_record(request):
                 chapter = scripture[1]
                 verse = scripture[2]
                 passage_content = scripture[3]
+                passage_formatted = scripture[4] # (KJV) Numbers 6:13
 
                 RecordPassage.objects.create(
                     record = record,
                     bible_id = bible_version_id,
                     chapter_id = chapter,
                     verse_id = verse,
-                    content = passage_content
+                    content = passage_content,
+                    passage_formatted = passage_formatted
                 )
 
             record.number_of_passages = len(scriptures)
             record.save(update_fields=['number_of_passages'])
 
         messages.success(request, 'Record created successfully')
-        return redirect('create_record')
+        return redirect('user_records')
 
     context = {
         "form": RecordNoteForm(),
@@ -286,8 +302,114 @@ def create_record(request):
 @login_required
 def user_records(request):
 
-    records = Record.objects.filter(user=request.user)
+    records = Record.objects.filter(user=request.user, is_deleted=False).order_by('-id')
     context = {
         'records': records
     }
     return render(request, 'records/user_records.html', context)
+
+@login_required
+def user_record(request, record_id):
+
+    try:
+        record = Record.objects.prefetch_related('record_passages').get(
+            user=request.user, 
+            id=record_id,
+            is_deleted = False
+        )
+    except Record.DoesNotExist:
+        messages.error(request, 'Record does not exist')
+        return redirect('user_records')
+
+    context = {
+        'record': record,
+        'passages': record.record_passages.all().order_by('-id')
+    }
+    return render(request, 'records/record.html', context)
+
+@login_required
+def edit_record(request, record_id):
+
+    try:
+        record = Record.objects.prefetch_related('record_passages').get(
+            user=request.user, 
+            id=record_id,
+            is_deleted = False
+        )
+    except Record.DoesNotExist:
+        messages.error(request, 'Record does not exist') 
+        return redirect('user_records')
+
+    if request.method == "POST":
+        title = request.POST.get('title')
+        scriptures = request.POST.getlist('scriptures[]')
+        
+        form = RecordNoteForm(request.POST)
+        if form.is_valid():
+            record_content = form.cleaned_data['note']
+        else:
+            messages.error(request, 'Invalid data entered')
+            return redirect('edit_record', record_id=record_id)
+
+        if title != record.title:
+            record.title = title
+
+
+        # delete current passages to recreate | TODO: Update later 
+        # if passages do not come in, it means they were deleted from frontend
+        record.record_passages.all().delete()
+
+        if scriptures:
+            for scripture in scriptures:
+                scripture = scripture.split('|')
+                
+                bible_version_id = scripture[0]
+                chapter = scripture[1]
+                verse = scripture[2]
+                passage_content = scripture[3]
+                passage_formatted = scripture[4] # (KJV) Numbers 6:13
+
+                RecordPassage.objects.create(
+                    record = record,
+                    bible_id = bible_version_id,
+                    chapter_id = chapter,
+                    verse_id = verse,
+                    content = passage_content,
+                    passage_formatted = passage_formatted
+                )
+            record.note = record_content
+            record.number_of_passages = len(scriptures)
+        
+        record.save()
+        messages.success(request, 'Record updated successfully')
+        return redirect('user_record', record_id=record_id)
+
+    form = RecordNoteForm(instance=record)
+
+    context = {
+        'form': form,
+        'record': record,
+        'passages': record.record_passages.all(),
+        "books": books,
+        "bible_versions": versions
+    }
+    return render(request, 'records/edit_record.html', context)
+    
+
+@login_required
+def delete_record(request, record_id):
+
+    try:
+        record = Record.objects.get(
+            user=request.user, 
+            id=record_id,
+            is_deleted = False
+        )
+        record.is_deleted = True
+        record.save()
+        messages.success(request, 'Record deleted successfully')
+    
+    except Record.DoesNotExist:
+        messages.error(request, 'Record does not exist')
+        
+    return redirect('user_records')

@@ -3,77 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homepage</title>
+    <title>{% block title %}Stuble - Your Digital Workspace{% endblock %}</title>
+    {% load static %}
+    <!-- jQuery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom Base Styles -->
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    
+    <!-- Block for additional head content -->
+    {% block extra_head %}{% endblock %}
 </head>
+
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">Stuble</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+                <i class="bi bi-journal-bookmark-fill me-2" style="color: #667eea; font-size: 1.5rem;"></i>
+                <span style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700;">
+                    Stuble
+                </span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" 
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
+                    style="border: 2px solid #667eea; background: white;">
+                <span class="navbar-toggler-icon" style="background-image: url('data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 30 30%27%3e%3cpath stroke=%27rgba(102, 126, 234, 1)%27 stroke-linecap=%27round%27 stroke-miterlimit=%2710%27 stroke-width=%272%27 d=%27M4 7h22M4 15h22M4 23h22%27/%3e%3c/svg%3e') !important;"></span>
             </button>
+            
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/bible/' %}active{% endif %}" href="{% url 'bible' %}">
+                            <i class="bi bi-book-half me-1"></i>Bible
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" 
+                        aria-expanded="false">
+                            <i class="bi bi-files me-1"></i>Records
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'create_record' %}">
+                                    <i class="bi bi-plus-circle"></i>Create record
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'user_records' %}">
+                                    <i class="bi bi-grid-3x3-gap-fill"></i>View records
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" 
+                        aria-expanded="false">
+                            <i class="bi bi-collection me-1"></i>Collections
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    <i class="bi bi-folder-plus"></i>Create collection
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    <i class="bi bi-folders"></i>View collections
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                     
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'bible' %}">Bible</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Records
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-robot me-1"></i>AI
                         </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'create_record' %}">Create record</a></li>
-                            <li><a class="dropdown-item" href="{% url 'user_records' %}">View records</a></li>
-                        </ul>
                     </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Collections
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-gear me-1"></i>Settings
                         </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Create collection</a></li>
-                            <li><a class="dropdown-item" href="#">View collections</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">AI</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="#">Setting</a>
                     </li>
                 </ul>
+                
                 {% if request.user.is_authenticated %}
                     <div class="d-none d-lg-block">
-                    <a class="btn btn-outline-danger" href="{% url 'logout_user' %}">Logout</a>
+                        <a class="btn btn-logout" href="{% url 'logout_user' %}">
+                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                        </a>
+                    </div>
+                    <!-- Mobile logout button (hidden on desktop) -->
+                    <div class="d-lg-none">
+                        <a class="btn btn-logout w-100" href="{% url 'logout_user' %}">
+                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                        </a>
                     </div>
                 {% endif %}
             </div>
         </div>
     </nav>
 
-    <div class="container">
+    <!-- Alert Messages Container -->
+    <div class="alert-container">
         {% if messages %}
             {% for message in messages %}
-                {% if messages.tags == 'error' %}
-                    <div class="alert alert-danger" role="alert">
-                        {{message}}
-                    </div>
-                {% else %}
-                    <div class="alert alert-success" role="alert">
-                        {{message}}
-                    </div>
-                {% endif %}
+                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}" 
+                     id="alert-message-{{ forloop.counter }}" 
+                     role="alert">
+                    <i class="bi {% if message.tags == 'error' %}bi-exclamation-triangle-fill{% else %}bi-check-circle-fill{% endif %} me-2"></i>
+                    {{ message }}
+                </div>
             {% endfor %}
         {% endif %}
     </div>
-    {% block content %}
 
-    {% endblock content %}
+    <!-- Main Content Area -->
+    <main class="main-content" style="margin-top: 80px;">
+        {% block content %}
+        {% endblock content %}
+    </main>
 
-        
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <!-- JavaScript -->
+    <script>
+        // Auto-hide alerts after 10 seconds with fade effect
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('[id^="alert-message-"]');
+            alerts.forEach(alert => {
+                if (alert) {
+                    alert.style.transition = 'opacity 0.5s ease';
+                    alert.style.opacity = '0';
+                    setTimeout(() => {
+                        alert.style.display = 'none';
+                    }, 500);
+                }
+            });
+        }, 10000);
+
+        // Add loading state to forms
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const submitBtn = this.querySelector('[type="submit"]');
+                if (submitBtn && !submitBtn.classList.contains('btn-loading')) {
+                    submitBtn.classList.add('btn-loading');
+                    submitBtn.disabled = true;
+                }
+            });
+        });
+
+        // Set active nav item based on current URL
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+    
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" 
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" 
+            crossorigin="anonymous"></script>
+    
+    <!-- Block for additional scripts -->
+    {% block extra_scripts %}{% endblock %}
+
 </body>
 </html>

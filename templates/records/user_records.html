@@ -2,31 +2,114 @@
 
 {% block content %}
 
-<div class="container full-height d-flex flex-column justify-content-center align-items-center">
-        
-    <p class="h2">Records</p>
-    <div class="row row-cols-1 row-cols-md-3 g-4">
+<div class="container py-5">
+    <!-- Header Section with better spacing -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="display-5 fw-bold text-primary mb-3">Records</h2>
+            <p class="text-muted">Browse through your collection of records</p>
+            <hr class="opacity-25">
+        </div>
+    </div>
+
+    <!-- Cards Grid with improved styling -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% for record in records %}
             <div class="col">
-                <div class="card" style="width: 18rem;">
-                    <img src="https://res.cloudinary.com/the-proton-guy/image/upload/v1771929301/images_gxvpl8.jpg" class="card-img-top" alt="...">
-                    <div class="card-body">
-                        <h5 class="card-title">{{record.title}}</h5>
-                        <p class="card-text">{{record.note.plain|truncatechars:30}}</p>
+                <div class="card h-100 shadow-sm border-0 rounded-4 hover-lift transition">
+                    <!-- Image with gradient overlay effect -->
+                    <div class="position-relative">
+                        <img src="https://res.cloudinary.com/the-proton-guy/image/upload/v1771929301/images_gxvpl8.jpg" 
+                             class="card-img-top rounded-top-4" 
+                             alt="{{record.title}}"
+                             style="height: 200px; object-fit: cover;">
+                        <div class="position-absolute top-0 end-0 m-3">
+                            <span class="badge bg-primary bg-opacity-75 rounded-pill px-3 py-2">
+                                <i class="bi bi-bookmark-fill me-1"></i>Record
+                            </span>
+                        </div>
                     </div>
-                    <ul class="list-group card-footer">
-                        <li class="list-group-item">Created: {{record.created_at}}</li>
-                    </ul>
-                    <div class="card-footer">
-                        <small class="text-body-secondary">Last updated {{record.last_updated_at}}</small>
+
+                    <!-- Card Body -->
+                    <div class="card-body p-4">
+                        <h5 class="card-title fw-semibold mb-3">{{record.title}}</h5>
+                        <p class="card-text text-secondary">{{record.note.plain|truncatechars:30}}</p>
                     </div>
-                    <div class="card-body">
-                        <a href="#" class="card-link ">View</a>
+
+                    <!-- Meta Information -->
+                    <div class="card-footer bg-transparent border-0 pt-0 px-4 pb-3">
+                        <div class="d-flex flex-column gap-2">
+                            <div class="d-flex align-items-center text-muted small">
+                                <i class="bi bi-calendar3 me-2"></i>
+                                <span>Created: {{record.created_at}}</span>
+                            </div>
+                            <div class="d-flex align-items-center text-muted small">
+                                <i class="bi bi-clock-history me-2"></i>
+                                <span>Updated: {{record.last_updated_at}}</span>
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- Action Button -->
+                    <div class="card-footer bg-transparent border-0 px-4 pb-4 pt-0">
+                        <a href="{% url 'user_record' record.id %}" 
+                           class="btn btn-outline-primary w-100 rounded-pill d-flex align-items-center justify-content-center gap-2">
+                            <span>View Details</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <!-- Empty State -->
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="bi bi-files fs-1 text-muted mb-3"></i>
+                    <h3 class="h4 fw-semibold mb-2">No Records Found</h3>
+                    <p class="text-muted mb-4">You haven't created any records yet.</p>
+                    <a href="#" class="btn btn-primary rounded-pill px-4">
+                        <i class="bi bi-plus-circle me-2"></i>Create New Record
+                    </a>
                 </div>
             </div>
         {% endfor %}
     </div>
 </div>
+
+<!-- Custom CSS for animations and effects -->
+<style>
+    .hover-lift {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    
+    .hover-lift:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .transition {
+        transition: all 0.3s ease;
+    }
+    
+    .card {
+        border: none;
+        background: white;
+        overflow: hidden;
+    }
+    
+    .badge {
+        font-weight: 500;
+        font-size: 0.75rem;
+    }
+    
+    .btn-outline-primary {
+        border-width: 2px;
+    }
+    
+    .btn-outline-primary:hover {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: transparent;
+    }
+</style>
 
 {% endblock content %}

@@ -91,15 +91,18 @@ class Record(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     last_updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
+    is_deleted = models.BooleanField(default=False)
+
     def __str__(self):
         return self.title
     
 class RecordPassage(models.Model):
     
-    record = models.ForeignKey(Record, on_delete=models.CASCADE, related_name='record_passages')
-    bible_id = models.CharField(max_length=10)
-    chapter_id = models.CharField(max_length=10)
+    record = models.ForeignKey(Record, null=True, blank=True, on_delete=models.CASCADE, related_name='record_passages')
+    bible_id = models.CharField(max_length=50)
+    chapter_id = models.CharField(max_length=50)
     verse_id = models.CharField(max_length=10, default='', null=True, blank=True)
+    passage_formatted = models.CharField(max_length=50, default='')
     content = models.TextField()
     
     def __str__(self):

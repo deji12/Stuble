@@ -2,57 +2,82 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homepage</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Join the Waiting List - Stuble</title>
+    {% load static %}
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{% static 'css/waiting_list.css' %}">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <!-- Simple Navbar -->
+    <nav class="navbar">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'waiting_list' %}">Stuble</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-            </button>
-           
+            <a class="navbar-brand" href="{% url 'waiting_list' %}">
+                <i class="bi bi-journal-bookmark-fill"></i>
+                <span>Stuble</span>
+            </a>
         </div>
     </nav>
 
-
-    <div class="container full-height d-flex flex-column justify-content-center align-items-center">
+    <!-- Alert Messages -->
+    <div class="alert-container">
         {% if messages %}
             {% for message in messages %}
-                {% if messages.tags == 'error' %}
-                    <div class="alert alert-danger" role="alert">
-                        {{message}}
-                    </div>
-                {% else %}
-                    <div class="alert alert-success" role="alert">
-                        {{message}}
-                    </div>
-                {% endif %}
+                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">
+                    <i class="bi {% if message.tags == 'error' %}bi-exclamation-triangle-fill{% else %}bi-check-circle-fill{% endif %}"></i>
+                    {{ message }}
+                </div>
             {% endfor %}
         {% endif %}
-        <p class="h2">Waiting List</p>
-        <br>
-        <form method="POST" class="row g-3">
-            {% csrf_token %}
-            <div class="col-auto">
-                <label for="email" class="visually-hidden">Email</label>
-                <input type="email" class="form-control" name="email" id="email" placeholder="Enter your email">
-            </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-primary mb-3">Submit</button>
-            </div>
-        </form>
     </div>
 
-<style>
-    
-    .full-height {
-      height: 100vh;
-    }
-  </style>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="waiting-card">
+            <!-- Icon -->
+            <div class="icon-wrapper">
+                <i class="bi bi-megaphone"></i>
+            </div>
+
+            <!-- Title -->
+            <h1>Join the Waitlist</h1>
+            <p class="subtitle">
+                Be the first to experience Stuble's Bible study platform.
+            </p>
+
+            <!-- Benefits -->
+            <ul class="benefits-list">
+                <li><i class="bi bi-check-lg"></i> Early access</li>
+                <li><i class="bi bi-check-lg"></i> Exclusive content</li>
+                <li><i class="bi bi-check-lg"></i> Priority support</li>
+                <li><i class="bi bi-check-lg"></i> Be part of community</li>
+            </ul>
+
+            <!-- Form - Stacked layout (input on top, button below) -->
+            <form method="POST" class="waiting-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <input type="email" class="form-control" name="email" 
+                           placeholder="Enter your email" required>
+                    <button type="submit" class="btn-submit" id="submit-btn">
+                        <i class="bi bi-send"></i> Join
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/waiting_list.js' %}"></script>
+
 </body>
 </html>
