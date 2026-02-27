@@ -97,6 +97,15 @@
     <!-- Block for additional head content -->
     {% block extra_head %}{% endblock %}
 </head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-T971PF6QGQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-T971PF6QGQ');
+</script>
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg fixed-top">
