@@ -6,22 +6,127 @@
 <link rel="stylesheet" href="{% static 'css/bible.css' %}">
 
 <div class="container py-5">
-    <!-- Header Section with improved styling -->
+    <!-- Breadcrumb -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Holy Bible</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Header Section - Styled like other pages -->
     <div class="row mb-5">
         <div class="col-12">
-            <h2 class="display-5 fw-bold text-primary mb-3">
-                <i class="bi bi-book-half me-2"></i>Holy Bible
-            </h2>
-            <p class="text-muted">Search and read scripture from multiple translations</p>
-            <hr class="opacity-25">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-4">
+                <div class="d-flex align-items-center gap-3">
+                    <!-- Bible Icon with gradient -->
+                    <div class="bible-icon-large" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                        <i class="bi bi-book-half fs-1 text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="display-5 fw-bold text-primary mb-2">Holy Bible</h1>
+                        <div class="d-flex flex-wrap align-items-center gap-3">
+                            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2">
+                                <i class="bi bi-translate me-1"></i>{{ bible_versions|length }} Translations
+                            </span>
+                            <span class="text-muted">
+                                <i class="bi bi-book me-1"></i>{{ books|length }} Books
+                            </span>
+                            <span class="text-muted">
+                                <i class="bi bi-search-heart me-1"></i>Search & Read
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary rounded-pill px-4" onclick="document.getElementById('version').scrollIntoView({ behavior: 'smooth' })">
+                        <i class="bi bi-arrow-down me-2"></i>Start Reading
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Welcome Card -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 bible-welcome-card">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-12 col-md-8">
+                            <h4 class="fw-semibold mb-2">Explore God's Word</h4>
+                            <p class="text-muted mb-md-0">Choose a translation, book, chapter, and verse to begin reading scripture.</p>
+                        </div>
+                        <div class="col-12 col-md-4 text-md-end">
+                            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2">
+                                <i class="bi bi-star-fill me-1"></i>66 Books | 1,189 Chapters
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row g-4 mb-5">
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 stat-card h-100">
+                <div class="card-body p-3 text-center">
+                    <div class="stat-icon-circle bg-primary bg-opacity-10 mx-auto mb-2">
+                        <i class="bi bi-book text-primary"></i>
+                    </div>
+                    <h5 class="fw-bold mb-0">66</h5>
+                    <small class="text-muted">Books</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 stat-card h-100">
+                <div class="card-body p-3 text-center">
+                    <div class="stat-icon-circle bg-success bg-opacity-10 mx-auto mb-2">
+                        <i class="bi bi-bookmarks text-success"></i>
+                    </div>
+                    <h5 class="fw-bold mb-0">1,189</h5>
+                    <small class="text-muted">Chapters</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 stat-card h-100">
+                <div class="card-body p-3 text-center">
+                    <div class="stat-icon-circle bg-warning bg-opacity-10 mx-auto mb-2">
+                        <i class="bi bi-pencil text-warning"></i>
+                    </div>
+                    <h5 class="fw-bold mb-0">31,102</h5>
+                    <small class="text-muted">Verses</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 stat-card h-100">
+                <div class="card-body p-3 text-center">
+                    <div class="stat-icon-circle bg-info bg-opacity-10 mx-auto mb-2">
+                        <i class="bi bi-translate text-info"></i>
+                    </div>
+                    <h5 class="fw-bold mb-0">{{ bible_versions|length }}</h5>
+                    <small class="text-muted">Translations</small>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Search Card with modern design -->
     <div class="row justify-content-center">
         <div class="col-12 col-lg-10">
-            <div class="card border-0 shadow-lg rounded-4 p-4 mb-5">
-                <div class="card-body">
+            <div class="card border-0 shadow-lg rounded-4 search-card">
+                <div class="card-body p-4">
                     <!-- Card Header with icon -->
                     <div class="d-flex align-items-center mb-4">
                         <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
@@ -129,18 +234,23 @@
     </div>
 
     <!-- Passage Display Section with modern card -->
-    <div class="row justify-content-center">
+    <div class="row justify-content-center mt-5">
         <div class="col-12 col-lg-10">
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden" id="passage-card" style="display: none;">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden passage-card" id="passage-card" style="display: none;">
                 <div class="card-header bg-white border-0 pt-4 px-4">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
-                            <i class="bi bi-quote fs-4 text-primary"></i>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
+                                <i class="bi bi-quote fs-4 text-primary"></i>
+                            </div>
+                            <div>
+                                <h4 class="h5 fw-semibold mb-1">Scripture Passage</h4>
+                                <p class="text-muted small mb-0" id="passage-reference"></p>
+                            </div>
                         </div>
-                        <div>
-                            <h4 class="h5 fw-semibold mb-1">Scripture Passage</h4>
-                            <p class="text-muted small mb-0" id="passage-reference"></p>
-                        </div>
+                        <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2">
+                            <i class="bi bi-bookmark me-1"></i>Word of God
+                        </span>
                     </div>
                 </div>
                 <div class="card-body p-4">
@@ -149,9 +259,35 @@
                     </div>
                 </div>
                 <div class="card-footer bg-white border-0 pb-4 px-4">
-                    <button class="btn btn-outline-primary btn-sm rounded-pill" onclick="copyPassage()">
-                        <i class="bi bi-clipboard me-1"></i>Copy Passage
-                    </button>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <button class="btn btn-outline-primary btn-sm rounded-pill" onclick="copyPassage()">
+                            <i class="bi bi-clipboard me-1"></i>Copy Passage
+                        </button>
+                        <small class="text-muted">
+                            <i class="bi bi-info-circle me-1"></i>Click verse to copy
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Tips -->
+    <div class="row justify-content-center mt-5">
+        <div class="col-12 col-lg-10">
+            <div class="card border-0 shadow-sm rounded-4 bg-light">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-3">
+                            <i class="bi bi-lightbulb fs-4 text-primary"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-semibold mb-1">Did you know?</h6>
+                            <p class="text-muted small mb-0">
+                                The Bible has been translated into over 700 languages. You can compare different versions side by side.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

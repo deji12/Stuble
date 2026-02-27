@@ -7,7 +7,7 @@ from django.views.decorators.http import require_GET
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import User, PasswordResetCode, Record, RecordPassage, RecordImage, WaitingList
+from .models import User, PasswordResetCode, Record, RecordPassage, Collection, WaitingList
 from django.contrib import messages
 from .utils import is_valid_email, superuser_required
 from django.urls import reverse
@@ -28,15 +28,17 @@ def landing(request):
 @login_required
 def home(request):
 
-    recent_records = Record.objects.filter(user=request.user, is_deleted=False).order_by('-id')[:5]
+    user = request.user
+    latest_records = Record.objects.filter(user=user, is_deleted=False).order_by('-id')[:5]
     latest_passages = RecordPassage.objects.filter(
-        record__user=request.user,
+        record__user=user,
         record__is_deleted=False
     ).order_by('-id')[:5]
     
     context = {
-        'recent_records': recent_records,
-        'recent_passages': latest_passages
+        'recent_records': latest_records,
+        'recent_passages': latest_passages,
+        'user': user
     }
     return render(request, 'home.html', context)
 
@@ -142,8 +144,6 @@ def send_out_bulk_email(request):
 
 
 
-
-
 # ----------------------------------------------------------------
 #                       USER & AUTH
 #-----------------------------------------------------------------
@@ -191,8 +191,10 @@ def register(request):
             password = password
         )
 
-        login(user)
-        return redirect('home')
+        email, created = WaitingList.objects.create(email=email)
+
+        login(request, user)
+        return redirect('dashboard')
 
     return render(request, 'auth/register.html')
 
@@ -417,6 +419,8 @@ def create_record(request):
             note = record_content
         )
 
+        user.number_of_records += 1
+
         if scriptures:
             for scripture in scriptures:
                 scripture = scripture.split('|')
@@ -438,6 +442,10 @@ def create_record(request):
 
             record.number_of_passages = len(scriptures)
             record.save(update_fields=['number_of_passages'])
+
+            user.number_of_saved_passages += len(scriptures)
+
+        user.save()
 
         messages.success(request, 'Record created successfully')
         return redirect('user_records')
@@ -485,9 +493,11 @@ def user_record(request, record_id):
 @login_required
 def edit_record(request, record_id):
 
+    user = request.user
+
     try:
         record = Record.objects.prefetch_related('record_passages').get(
-            user=request.user, 
+            user=user, 
             id=record_id,
             is_deleted = False
         )
@@ -510,9 +520,12 @@ def edit_record(request, record_id):
             record.title = title
 
 
-        # delete current passages to recreate | TODO: Update later 
         # if passages do not come in, it means they were deleted from frontend
-        record.record_passages.all().delete()
+        record_passages = record.record_passages.all()
+        number_of_passages = record_passages.count()
+        record_passages.delete()
+
+        user.number_of_saved_passages -= number_of_passages
 
         if scriptures:
             for scripture in scriptures:
@@ -532,10 +545,14 @@ def edit_record(request, record_id):
                     content = passage_content,
                     passage_formatted = passage_formatted
                 )
+            user.number_of_saved_passages += len(scriptures)
+
             record.note = record_content
             record.number_of_passages = len(scriptures)
         
         record.save()
+        user.save()
+
         messages.success(request, 'Record updated successfully')
         return redirect('user_record', record_id=record_id)
 
@@ -553,14 +570,21 @@ def edit_record(request, record_id):
 @login_required
 def delete_record(request, record_id):
 
+    user = request.user
     try:
         record = Record.objects.get(
-            user=request.user, 
+            user=user, 
             id=record_id,
             is_deleted = False
         )
         record.is_deleted = True
         record.save()
+
+        # make sure to update the number of passages
+        number_of_saved_passages = record.record_passages.all().count()
+        user.number_of_saved_passages -= number_of_saved_passages
+        user.save()
+
         messages.success(request, 'Record deleted successfully')
     
     except Record.DoesNotExist:
@@ -577,9 +601,127 @@ def delete_record(request, record_id):
 #-----------------------------------------------------------------
 
 @login_required
-def collections(request):
+def user_collections(request):
+
+    user = request.user
+
+    records = Record.objects.filter(user=user, is_deleted=False)
+    collections = Collection.objects.filter(user=user, is_deleted=False)
 
     context = {
-
+        'user_records': records,
+        'collections': collections
     }
-    return render(request, 'collection/collections.html', context)
+    return render(request, 'collections/user_collections.html', context)
+
+@login_required
+def create_collection(request):
+
+    user = request.user
+    
+    if request.method == 'POST':
+        collection_title = request.POST.get('collection_title')
+        record_ids  = request.POST.getlist('records')
+
+        if not collection_title:
+            messages.error(request, 'Collection name is required')
+            return redirect('user_collections')
+
+        
+        new_collection = Collection.objects.create(
+            title=collection_title,
+            user=user  
+        )
+
+        if record_ids:
+            # Optional: Filter to ensure records belong to the user
+            records = Record.objects.filter(
+                id__in=record_ids,
+                user=request.user
+            )
+            new_collection.records.set(records)  
+
+        user.number_of_collections += 1
+        user.save(updated_fields=['number_of_collections'])
+        
+        messages.success(request, 'Collection created successfully')
+        return redirect('user_collections')
+    
+@login_required
+def edit_collection(request):
+
+    user = request.user
+    
+    if request.method == 'POST':
+        collection_id = request.POST.get('collection_id')
+        collection_title = request.POST.get('title')
+        record_ids = request.POST.getlist('records')
+        
+        if not collection_title:
+            messages.error(request, 'Collection name is required')
+            return redirect('user_collections')
+        
+        try:
+            collection = Collection.objects.get(id=collection_id, user=user)
+            
+            collection.title = collection_title
+            
+            if record_ids:
+                # Filter to ensure records belong to the user
+                records = Record.objects.filter(
+                    id__in=record_ids,
+                    user=user
+                )
+                collection.records.set(records)
+            else:
+                # If no records selected, clear the collection
+                collection.records.clear()
+            
+            collection.save()
+            messages.success(request, 'Collection updated successfully')
+            
+        except Collection.DoesNotExist:
+            messages.error(request, 'Collection not found')
+            
+        return redirect('user_collections')
+    
+@login_required
+def delete_collection(request):
+
+    user = request.user
+
+    if request.method == 'POST':
+        collection_id = request.POST.get('collection_id')
+        
+        try:
+            collection = Collection.objects.get(id=collection_id, user=user)
+            collection.is_deleted = True
+            collection.save(update_fields=['is_deleted'])
+
+            user.number_of_collections -= 1
+            user.save(updated_fields=['number_of_collections'])
+            messages.success(request, 'Collection deleted successfully')
+        except Collection.DoesNotExist:
+            messages.error(request, 'Collection not found')
+    
+    return redirect('user_collections')
+
+@login_required
+def user_collection(request, collection_id):
+
+    user = request.user
+
+    try:
+        collection = Collection.objects.get(id=collection_id, user=user)
+    except Collection.DoesNotExist:
+        messages.error(request, 'Collection does not exist')
+
+    records = Record.objects.filter(user=user, is_deleted=False)
+    
+
+    context = {
+        'collection': collection,
+        'user_records': records,
+    }
+
+    return render(request, 'collections/user_collection.html', context)

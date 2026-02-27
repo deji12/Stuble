@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const accordionBody = document.getElementById('accordionFlushExample');
     const addScriptureBtn = document.getElementById('add-scripture-btn');
     const createRecordForm = document.getElementById('add-record-form');
+    const emptyScriptureCard = document.getElementById('empty-scriptures-message');
 
     // store the selected book's data
     let selectedBookName = null;
@@ -197,6 +198,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (document.querySelector('#accordionFlushExample').children.length > 0 && !displayedScripture) {
             showScriptureAccordion();
+            if (emptyScriptureCard) {
+                emptyScriptureCard.remove();
+            }
         }
     };
 
@@ -224,6 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             addPassage(passageData, biblePassageFormatted);
             searchForm.reset();
+            passageData = null
 
             // display success message in increment scriptures count
             document.getElementById("passage").innerHTML = `<span style="color:#198754;"><b>Passage added successfully!</b></span>`;

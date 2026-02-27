@@ -5,67 +5,149 @@
 <!-- Enhanced CSS for better styling -->
 <link rel="stylesheet" href="{% static 'css/bible.css' %}">
 <link rel="stylesheet" href="{% static 'css/record.css' %}">
-<div class="container-lg full-height mt-5">
-    
-    <div class="d-flex justify-content-between align-items-center mb-5">
-        <div class="text-center flex-grow-1">
-            <h1 class="fw-bold mb-1">{{ record.title }}</h1>
-            <hr class="mx-auto" style="width: 80px;">
-        </div>
 
-        <!-- Actions -->
-        <div class="ms-3">
-            <a href="{% url 'edit_record' record.id %}"
-            class="btn btn-sm btn-outline-secondary me-2">
-                ✏️ Edit
-            </a>
-
-            <button class="btn btn-sm btn-outline-danger"
-                    data-bs-toggle="modal"
-                    data-bs-target="#deleteRecordModal">
-                🗑 Delete
-            </button>
+<div class="container py-5">
+    <!-- Breadcrumb -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'user_records' %}" class="text-decoration-none">Records</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ record.title|truncatechars:30 }}</li>
+                </ol>
+            </nav>
         </div>
     </div>
-    
 
-    <div class="row">
-        <!-- Left: Write-up -->
-        <div class="col-12 col-lg-6 mb-4">
-            <div class="content-box p-4 bg-white rounded shadow-sm">
-                {{ record.note.html|safe }}
-            </div>
-        </div>
-
-        <!-- Right: Scriptures -->
-        <div class="col-12 col-lg-6">
-            <div class="p-4 bg-light rounded shadow-sm">
-                <h5 class="mb-3 text-muted">Scriptures</h5>
-                <div class="accordion passage" id="accordionFlushExample">
-                    {% for passage in passages %}
-                        <div class="accordion-item" id="accordion-scripture-{{ passage.id }}">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button"
-                                        data-bs-toggle="collapse"
-                                        data-bs-target="#flush-collapse{{ passage.id }}">
-                                    {{ passage.passage_formatted|safe }}
-                                </button>
-                            </h2>
-                            <div id="flush-collapse{{ passage.id }}"
-                                class="accordion-collapse collapse"
-                                data-bs-parent="#accordionFlushExample">
-                                <div class="accordion-body">
-                                    {{ passage.content|safe }}
-                                </div>
-                            </div>
+    <!-- Record Header (Styled like Collections) -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-4">
+                <div class="d-flex align-items-center gap-3">
+                    <!-- Record Icon with dynamic color -->
+                    <div class="record-icon-large" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                        <i class="bi bi-journal-text fs-1 text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="display-5 fw-bold text-primary mb-2">{{ record.title }}</h1>
+                        <div class="d-flex flex-wrap align-items-center gap-3">
+                            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2">
+                                <i class="bi bi-bookmarks me-1"></i>{{ passages|length }} passage{{ passages|length|pluralize }}
+                            </span>
+                            <span class="text-muted">
+                                <i class="bi bi-calendar3 me-1"></i>Created {{ record.created_at|date:"M d, Y" }}
+                            </span>
+                            <span class="text-muted">
+                                <i class="bi bi-clock-history me-1"></i>Updated {{ record.last_updated_at|date:"M d, Y" }}
+                            </span>
                         </div>
-                    {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2">
+                    <a href="{% url 'edit_record' record.id %}" class="btn btn-outline-primary rounded-pill px-4">
+                        <i class="bi bi-pencil me-2"></i>Edit
+                    </a>
+                    <button class="btn btn-outline-danger rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#deleteRecordModal">
+                        <i class="bi bi-trash3 me-2"></i>Delete
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Content Grid -->
+    <div class="row g-4">
+        <!-- Left: Write-up -->
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
+                            <i class="bi bi-pencil-square fs-4 text-primary"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-semibold mb-1">Notes</h5>
+                            <p class="text-muted small mb-0">Your personal reflections and insights</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="content-box">
+                        {{ record.note.html|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Scriptures -->
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
+                            <i class="bi bi-book-half fs-4 text-primary"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-semibold mb-1">Scriptures</h5>
+                            <p class="text-muted small mb-0">{{ passages|length }} passage{{ passages|length|pluralize }} attached to this record</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    {% if passages %}
+                        <div class="accordion passage" id="accordionFlushExample">
+                            {% for passage in passages %}
+                                <div class="accordion-item border-0 mb-3 rounded-3 shadow-sm" id="accordion-scripture-{{ passage.id }}">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed rounded-3" type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#flush-collapse{{ passage.id }}">
+                                            <div>
+                                                <i class="bi bi-quote me-2 text-primary"></i>
+                                                {{ passage.passage_formatted|safe }}
+                                            </div>
+                                        </button>
+                                    </h2>
+                                    <div id="flush-collapse{{ passage.id }}"
+                                         class="accordion-collapse collapse"
+                                         data-bs-parent="#accordionFlushExample">
+                                        <div class="accordion-body bg-light rounded-bottom-3 p-4">
+                                            {{ passage.content|safe }}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div class="empty-state-icon mb-3">
+                                <i class="bi bi-book fs-1 text-muted"></i>
+                            </div>
+                            <h6 class="fw-semibold mb-2">No scriptures yet</h6>
+                            <p class="text-muted small mb-3">Add scriptures to this record while editing</p>
+                            <a href="{% url 'edit_record' record.id %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                                <i class="bi bi-plus-circle me-1"></i>Add Scriptures
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Records Link -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <a href="{% url 'user_records' %}" class="btn btn-outline-secondary rounded-pill">
+                <i class="bi bi-arrow-left me-2"></i>Back to Records
+            </a>
+        </div>
+    </div>
 </div>
+
+<!-- Delete Record Modal (kept the same) -->
 <div class="modal fade" id="deleteRecordModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
@@ -99,7 +181,7 @@
                     </p>
                 </div>
 
-                <!-- Record Details Card (Optional - shows what's being deleted) -->
+                <!-- Record Details Card -->
                 <div class="bg-light rounded-3 p-3 mb-3">
                     <div class="d-flex align-items-center">
                         <div class="bg-danger bg-opacity-10 p-2 rounded-3 me-3">
@@ -131,5 +213,5 @@
     </div>
 </div>
 
-<script src="{% static 'js/record.js' %}">
+<script src="{% static 'js/record.js' %}"></script>
 {% endblock content %}

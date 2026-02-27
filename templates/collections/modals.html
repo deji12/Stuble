@@ -1,0 +1,252 @@
+<!-- Create Collection Modal (with record selection) -->
+<div class="modal fade" id="createCollectionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-primary text-white border-0 rounded-top-4">
+                <div>
+                    <h5 class="modal-title fw-semibold">
+                        <i class="bi bi-folder-plus me-2"></i>Create New Collection
+                    </h5>
+                    <small class="text-white-50">Group your records by theme or topic</small>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{% url 'create_collection' %}">
+                {% csrf_token %}
+                <div class="modal-body p-4">
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold text-secondary small text-uppercase tracking-wide">
+                            <i class="bi bi-tag me-1"></i>Collection Name
+                        </label>
+                        <input type="text" class="form-control form-control-lg rounded-3 border-0 bg-light" 
+                               name="collection_title" placeholder="e.g., Faith, Prayer, Romans Study" required>
+                    </div>
+                    
+                    <!-- Record Selection -->
+                    <div class="mt-4">
+                        
+                        <!-- Record Selection - Bootstrap Dropdown with Search -->
+                        <div class="mt-4">
+                            <label class="form-label fw-semibold text-secondary small text-uppercase tracking-wide mb-3">
+                                <i class="bi bi-files me-1"></i>Add Records
+                            </label>
+                            
+                            <!-- Dropdown -->
+                            <div class="dropdown">
+                                <button class="btn btn-outline-primary w-100 text-start d-flex justify-content-between align-items-center rounded-3 py-2" 
+                                        type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span><i class="bi bi-search me-2"></i>Select Records</span>
+                                    <span class="badge bg-primary rounded-pill" id="selectedCountDropdown">0</span>
+                                </button>
+                                
+                                <div class="dropdown-menu p-3 w-100" style="max-height: 400px; overflow-y: auto;">
+                                    <!-- Search Box Inside Dropdown -->
+                                    <div class="mb-3">
+                                        <input type="text" class="form-control form-control-sm rounded-3" 
+                                            id="dropdownSearch" placeholder="Type to search records...">
+                                    </div>
+                                    
+                                    <!-- Records List -->
+                                    <div id="recordsList">
+                                        {% for record in user_records %}
+                                            <div class="dropdown-item p-2 rounded-3 record-item" style="cursor: default;">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="form-check me-3">
+                                                        <input class="form-check-input record-checkbox" type="checkbox" 
+                                                            name="records" value="{{ record.id }}" 
+                                                            id="record{{ record.id }}"
+                                                            onchange="updateCreateCount()">
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <div class="fw-semibold small">{{ record.title }}</div>
+                                                        <div class="small text-muted">
+                                                            <i class="bi bi-calendar3 me-1"></i>{{ record.created_at|date:"M d, Y" }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% empty %}
+                                            <p class="text-muted text-center py-2 small">No records available</p>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Selected Count (hidden but updated via JS) -->
+                            <div class="mt-2 small text-muted">
+                                <span id="selectedCount">0</span> records selected
+                            </div>
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                    <button type="button" class="btn btn-outline-secondary rounded-3" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg me-2"></i>Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary rounded-3">
+                        <i class="bi bi-check-circle me-2"></i>Create Collection
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Collection Modal (hidden by default, shown via JavaScript) -->
+<div class="modal fade" id="editCollectionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-primary text-white border-0 rounded-top-4">
+                <div>
+                    <h5 class="modal-title fw-semibold">
+                        <i class="bi bi-pencil me-2"></i>Edit Collection
+                    </h5>
+                    <small class="text-white-50" id="editCollectionSubtitle">Update name and manage records</small>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <form method="POST" action="{% url 'edit_collection' %}" id="editCollectionForm">
+                {% csrf_token %}
+                <input type="hidden" name="collection_id" id="edit_collection_id">
+                
+                <div class="modal-body p-4">
+                    <!-- Collection Name -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold text-secondary small text-uppercase tracking-wide">
+                            <i class="bi bi-tag me-1"></i>Collection Name
+                        </label>
+                        <input type="text" class="form-control form-control-lg rounded-3 border-0 bg-light" 
+                               name="title" id="edit_collection_title" placeholder="e.g., Faith, Prayer, Romans Study" required>
+                    </div>
+                    
+                    <!-- Record Selection - Bootstrap Dropdown with Search -->
+                    <div class="mt-4">
+                        <label class="form-label fw-semibold text-secondary small text-uppercase tracking-wide mb-3">
+                            <i class="bi bi-files me-1"></i>Manage Records
+                        </label>
+                        
+                        <!-- Dropdown -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-primary w-100 text-start d-flex justify-content-between align-items-center rounded-3 py-2" 
+                                    type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span><i class="bi bi-search me-2"></i>Select Records</span>
+                                <span class="badge bg-primary rounded-pill" id="editSelectedCountDropdown">0</span>
+                            </button>
+                            
+                            <div class="dropdown-menu p-3 w-100" style="max-height: 400px; overflow-y: auto;">
+                                <!-- Search Box Inside Dropdown -->
+                                <div class="mb-3">
+                                    <input type="text" class="form-control form-control-sm rounded-3" 
+                                           id="editDropdownSearch" placeholder="Type to search records...">
+                                </div>
+                                
+                                <!-- Records List -->
+                                <div id="editRecordsList">
+                                    {% for record in user_records %}
+                                        <div class="dropdown-item p-2 rounded-3 record-item" style="cursor: default;">
+                                            <div class="d-flex align-items-center">
+                                                <div class="form-check me-3">
+                                                    <input class="form-check-input record-checkbox" type="checkbox" 
+                                                           name="records" value="{{ record.id }}" 
+                                                           id="edit_record_{{ record.id }}"
+                                                           {% if record in collection.records.all %}checked{% endif %}
+                                                           onchange="updateEditCount()">
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <div class="fw-semibold small">{{ record.title }}</div>
+                                                    <div class="small text-muted">
+                                                        <i class="bi bi-calendar3 me-1"></i>{{ record.created_at|date:"M d, Y" }}
+                                                        <span class="ms-2"><i class="bi bi-bookmarks me-1"></i>{{ record.number_of_passages }} passages</span>
+                                                    </div>
+                                                </div>
+                                                <a href="{% url 'user_record' record.id %}" class="btn btn-sm btn-outline-secondary rounded-pill ms-2" target="_blank">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    {% empty %}
+                                        <p class="text-muted text-center py-2 small">No records available</p>
+                                    {% endfor %}
+                                </div>
+                                
+                                <!-- Quick Actions Inside Dropdown -->
+                                <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                                    <div class="small">
+                                        <a href="#" class="text-primary text-decoration-none" id="editSelectAllRecords">Select All</a>
+                                        <span class="text-muted mx-2">|</span>
+                                        <a href="#" class="text-primary text-decoration-none" id="editDeselectAllRecords">Deselect All</a>
+                                    </div>
+                                    <div>
+                                        <a href="{% url 'create_record' %}" class="btn btn-sm btn-outline-success rounded-pill" target="_blank">
+                                            <i class="bi bi-plus-circle me-1"></i>New Record
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Selected Count Display -->
+                        <div class="mt-2 small text-muted">
+                            <span id="editSelectedCount">0</span> records selected
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                    <div class="d-flex justify-content-between w-100">
+                        
+                        <div>
+                            <button type="button" class="btn btn-outline-secondary rounded-3 me-2" data-bs-dismiss="modal">
+                                <i class="bi bi-x-lg me-2"></i>Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary rounded-3">
+                                <i class="bi bi-check-circle me-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Collection Modal -->
+<div class="modal fade" id="deleteCollectionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger text-white border-0 rounded-top-4">
+                <div>
+                    <h5 class="modal-title fw-semibold">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Delete Collection
+                    </h5>
+                    <small class="text-white-50">This action cannot be undone</small>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <div class="bg-danger bg-opacity-10 rounded-circle p-3 d-inline-flex mb-3">
+                    <span class="fs-1 text-danger">❌</span>
+                </div>
+                <h6 class="fw-semibold mb-2" id="deleteCollectionTitle">Delete this collection?</h6>
+                <p class="text-muted mb-0">
+                    This will remove the collection but <strong>your records will NOT be deleted</strong>. They'll still be available in your records page.
+                </p>
+            </div>
+            <form method="POST" action="{% url 'delete_collection' %}" id="deleteCollectionForm">
+                {% csrf_token %}
+                <input type="hidden" name="collection_id" id="delete_collection_id">
+                <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                    <button type="button" class="btn btn-outline-secondary rounded-3" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg me-2"></i>Cancel
+                    </button>
+                    <button type="submit" class="btn btn-danger rounded-3">
+                        <i class="bi bi-trash3 me-2"></i>Delete Collection
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

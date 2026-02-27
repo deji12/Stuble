@@ -55,8 +55,8 @@ class WaitingListAdmin(ImportExportModelAdmin):
 
 @admin.register(Collection)
 class CollectionAdmin(ImportExportModelAdmin):
-    list_display = ('id', 'title', 'user')
-    list_filter = ('user',)
+    list_display = ('title', 'id', 'user', 'is_deleted', 'created_at')
+    list_filter = ('user', 'created_at', 'last_updated_at', 'is_deleted')
     search_fields = ('title', 'user__email')
     ordering = ('title',)
 

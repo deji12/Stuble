@@ -34,7 +34,8 @@ CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS').split(',')
 
 INSTALLED_APPS = [
     'jazzmin',
-    'django.contrib.admin',
+    # 'django.contrib.admin',
+    'hide_admin.apps.HideAdminConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',

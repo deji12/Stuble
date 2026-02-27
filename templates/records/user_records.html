@@ -2,23 +2,46 @@
 
 {% block content %}
 {% load static %}
-<link rel="stylesheet" src="{% static 'css/records.css' %}">
+<link rel="stylesheet" href="{% static 'css/records.css' %}">
 
 <div class="container py-5">
-    <!-- Header Section with better spacing -->
-    <div class="row mb-4">
+    <!-- Header Section - Styled like Collections -->
+    <div class="row mb-5">
         <div class="col-12">
-            <h2 class="display-5 fw-bold text-primary mb-3">Records</h2>
-            <p class="text-muted">Browse through your collection of records</p>
-            <hr class="opacity-25">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-4">
+                <div class="d-flex align-items-center gap-3">
+                    <!-- Records Icon with gradient -->
+                    <div class="records-icon-large" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                        <i class="bi bi-files fs-1 text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="display-5 fw-bold text-primary mb-2">My Records</h1>
+                        <div class="d-flex flex-wrap align-items-center gap-3">
+                            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2">
+                                <i class="bi bi-file-text me-1"></i>{{ records.count }} total record{{ records.count|pluralize }}
+                            </span>
+                            <span class="text-muted">
+                                <i class="bi bi-bookmarks me-1"></i>With scriptures
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Create Record Button -->
+                <div>
+                    <a href="{% url 'create_record' %}" class="btn btn-primary rounded-pill px-4">
+                        <i class="bi bi-plus-circle me-2"></i>Create New Record
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Search Bar Section -->
     <div class="row mb-5">
         <div class="col-12">
-            <div class="card border-0 shadow-sm rounded-4 p-3 bg-light">
-                <div class="card-body">
+            <div class="card border-0 shadow-sm rounded-4 bg-light">
+                <div class="card-body p-4">
                     <form method="GET" action="{% url 'user_records' %}" class="row g-3 align-items-end">
                         <!-- Search Input -->
                         <div class="col-12 col-md-8 col-lg-9">
@@ -54,30 +77,44 @@
     {% if request.GET.q %}
         <div class="row mb-4">
             <div class="col-12">
-                <p class="text-muted">
-                    <i class="bi bi-files me-2"></i>
+                <div class="alert alert-info bg-opacity-10 border-0 rounded-3" style="background-color: rgba(102, 126, 234, 0.05);">
+                    <i class="bi bi-info-circle me-2 text-primary"></i>
                     Found <strong>{{ records.count }}</strong> record{{ records.count|pluralize }} matching "{{ request.GET.q }}"
-                </p>
+                </div>
             </div>
         </div>
     {% endif %}
 
-    <!-- Cards Grid with improved styling -->
+    <!-- Cards Grid -->
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% for record in records %}
             <div class="col">
-                <div class="card h-100 shadow-sm border-0 rounded-4 hover-lift transition">
-                    <!-- Image with gradient overlay effect -->
+                <div class="card h-100 border-0 shadow-sm rounded-4 hover-lift transition">
+                    <!-- Card Header with Color Accent -->
                     <div class="position-relative">
+                        <div class="record-color-bar" style="height: 8px; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 16px 16px 0 0;"></div>
+                        
+                        <!-- Image (if you want to keep it, otherwise you can remove) -->
                         <img src="https://res.cloudinary.com/the-proton-guy/image/upload/v1771929301/images_gxvpl8.jpg" 
                              class="card-img-top rounded-top-4" 
                              alt="{{record.title}}"
-                             style="height: 200px; object-fit: cover;">
+                             style="height: 160px; object-fit: cover;">
+                        
+                        <!-- Record Type Badge -->
                         <div class="position-absolute top-0 end-0 m-3">
                             <span class="badge bg-primary bg-opacity-75 rounded-pill px-3 py-2">
                                 <i class="bi bi-bookmark-fill me-1"></i>Record
                             </span>
                         </div>
+                        
+                        <!-- Passage Count Badge (if has passages) -->
+                        {% if record.number_of_passages > 0 %}
+                        <div class="position-absolute bottom-0 start-0 m-3">
+                            <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+                                <i class="bi bi-bookmarks me-1 text-primary"></i>{{ record.number_of_passages }}
+                            </span>
+                        </div>
+                        {% endif %}
                     </div>
 
                     <!-- Card Body -->
@@ -89,7 +126,7 @@
                                 {{ record.title }}
                             {% endif %}
                         </h5>
-                        <p class="card-text text-secondary">{{ record.note.plain|truncatechars:30 }}</p>
+                        <p class="card-text text-secondary small">{{ record.note.plain|truncatechars:80 }}</p>
                     </div>
 
                     <!-- Meta Information -->
@@ -121,24 +158,48 @@
             <div class="col-12">
                 <div class="text-center py-5">
                     {% if request.GET.q %}
-                        <i class="bi bi-search fs-1 text-muted mb-3"></i>
+                        <div class="empty-state-icon mb-4">
+                            <i class="bi bi-search fs-1 text-muted"></i>
+                        </div>
                         <h3 class="h4 fw-semibold mb-2">No Matching Records</h3>
                         <p class="text-muted mb-4">No records found matching "{{ request.GET.q }}"</p>
                         <a href="{% url 'user_records' %}" class="btn btn-outline-primary rounded-pill px-4">
                             <i class="bi bi-arrow-left me-2"></i>Clear Search
                         </a>
                     {% else %}
-                        <i class="bi bi-files fs-1 text-muted mb-3"></i>
-                        <h3 class="h4 fw-semibold mb-2">No Records Found</h3>
-                        <p class="text-muted mb-4">You haven't created any records yet.</p>
+                        <div class="empty-state-icon mb-4">
+                            <i class="bi bi-files fs-1 text-muted"></i>
+                        </div>
+                        <h3 class="h4 fw-semibold mb-2">No Records Yet</h3>
+                        <p class="text-muted mb-4">Start your Bible study journey by creating your first record</p>
                         <a href="{% url 'create_record' %}" class="btn btn-primary rounded-pill px-4">
-                            <i class="bi bi-plus-circle me-2"></i>Create New Record
+                            <i class="bi bi-plus-circle me-2"></i>Create Your First Record
                         </a>
                     {% endif %}
                 </div>
             </div>
         {% endfor %}
     </div>
-</div>
 
-{% endblock content %}
+    <!-- Optional: Quick Stats Footer -->
+    {% if records.count > 0 %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 bg-light">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-around flex-wrap gap-3">
+                        <div class="text-center">
+                            <h4 class="fw-bold text-primary mb-1">{{ records.count }}</h4>
+                            <span class="text-muted small">Total Records</span>
+                        </div>
+                       
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+<script src="{% static 'js/user_records.js' %}"></script>
+{% endblock %}

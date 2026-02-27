@@ -2,39 +2,78 @@
 
 {% block title %}Edit Account - Stuble{% endblock %}
 {% load static %}
-<link rel="stylesheet" href="{% static 'css/settings.css' %}">
+
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/settings.css' %}">
+
 <div class="container py-5">
-    <!-- Header Section -->
+    <!-- Breadcrumb -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Account Settings</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Header Section - Styled like Collections -->
     <div class="row mb-5">
-        <div class="col-12 text-center">
-            <h2 class="display-5 fw-bold text-primary mb-3">
-                <i class="bi bi-person-gear me-2"></i>Edit Account
-            </h2>
-            <p class="text-muted">Update your personal information and password</p>
-            <hr class="opacity-25 w-25 mx-auto">
+        <div class="col-12">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-4">
+                <div class="d-flex align-items-center gap-3">
+                    <!-- Account Icon with gradient -->
+                    <div class="account-icon-large" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                        <i class="bi bi-person-gear fs-1 text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="display-5 fw-bold text-primary mb-2">Account Settings</h1>
+                        <div class="d-flex flex-wrap align-items-center gap-3">
+                            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2">
+                                <i class="bi bi-person-circle me-1"></i>{{ request.user.first_name }} {{ request.user.last_name }}
+                            </span>
+                            <span class="text-muted">
+                                <i class="bi bi-envelope me-1"></i>{{ request.user.email }}
+                            </span>
+                            <span class="text-muted">
+                                <i class="bi bi-calendar3 me-1"></i>Joined {{ request.user.date_joined|date:"M Y" }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Dashboard Button -->
+                <div>
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-primary rounded-pill px-4">
+                        <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="row justify-content-center">
         <div class="col-12 col-lg-8">
-            <div class="card border-0 shadow-lg rounded-4 p-4">
-                <div class="card-body">
-                    <!-- Form Header -->
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
-                            <i class="bi bi-person-circle fs-4 text-primary"></i>
+            <!-- Main Settings Card -->
+            <div class="card border-0 shadow-lg rounded-4 mb-4">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
+                            <i class="bi bi-sliders2 fs-4 text-primary"></i>
                         </div>
                         <div>
-                            <h3 class="h5 fw-semibold mb-1">Account Settings</h3>
-                            <p class="text-muted small mb-0">Manage your profile and security</p>
+                            <h4 class="h5 fw-semibold mb-1">Edit Profile</h4>
+                            <p class="text-muted small mb-0">Update your personal information and security settings</p>
                         </div>
                     </div>
-
+                </div>
+                <div class="card-body p-4">
                     <!-- Messages -->
                     {% if messages %}
                         {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-3" role="alert">
                                 <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %} me-2"></i>
                                 {{ message }}
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -47,12 +86,12 @@
                         {% csrf_token %}
                         
                         <!-- Personal Information Section -->
-                        <div class="mb-4">
-                            <h6 class="fw-semibold mb-3 text-secondary">
+                        <div class="mb-5">
+                            <h6 class="fw-semibold mb-3 text-secondary border-bottom pb-2">
                                 <i class="bi bi-info-circle me-2"></i>Personal Information
                             </h6>
                             
-                            <div class="row g-3">
+                            <div class="row g-4">
                                 <div class="col-md-6">
                                     <label class="form-label fw-semibold text-secondary small text-uppercase tracking-wide">
                                         <i class="bi bi-person me-1"></i>First Name
@@ -84,12 +123,12 @@
 
                         <!-- Password Change Section -->
                         <div class="mb-4">
-                            <h6 class="fw-semibold mb-3 text-secondary">
+                            <h6 class="fw-semibold mb-3 text-secondary border-bottom pb-2">
                                 <i class="bi bi-shield-lock me-2"></i>Change Password
                             </h6>
                             <p class="text-muted small mb-3">Leave blank if you don't want to change your password</p>
                             
-                            <div class="row g-3">
+                            <div class="row g-4">
                                 <div class="col-12">
                                     <label class="form-label fw-semibold text-secondary small text-uppercase tracking-wide">
                                         <i class="bi bi-key me-1"></i>Current Password
@@ -97,7 +136,7 @@
                                     <div class="input-group">
                                         <input type="password" class="form-control form-control-lg rounded-3 border-0 bg-light" 
                                                name="current_password" id="current_password" placeholder="Enter current password">
-                                        <button class="btn btn-outline-secondary toggle-password" type="button" data-target="current_password">
+                                        <button class="btn btn-outline-secondary toggle-password rounded-3" type="button" data-target="current_password">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>
@@ -110,7 +149,7 @@
                                     <div class="input-group">
                                         <input type="password" class="form-control form-control-lg rounded-3 border-0 bg-light" 
                                                name="new_password" id="new_password" placeholder="Enter new password">
-                                        <button class="btn btn-outline-secondary toggle-password" type="button" data-target="new_password">
+                                        <button class="btn btn-outline-secondary toggle-password rounded-3" type="button" data-target="new_password">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>
@@ -123,14 +162,14 @@
                                     <div class="input-group">
                                         <input type="password" class="form-control form-control-lg rounded-3 border-0 bg-light" 
                                                name="confirm_password" id="confirm_password" placeholder="Confirm new password">
-                                        <button class="btn btn-outline-secondary toggle-password" type="button" data-target="confirm_password">
+                                        <button class="btn btn-outline-secondary toggle-password rounded-3" type="button" data-target="confirm_password">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>
                                 </div>
                             </div>
                             
-                            <!-- Password strength indicator (optional) -->
+                            <!-- Password strength indicator -->
                             <div class="password-strength mt-3 d-none" id="password-strength">
                                 <div class="d-flex justify-content-between mb-1">
                                     <small class="text-muted">Password strength:</small>
@@ -146,11 +185,11 @@
                         </div>
 
                         <!-- Form Actions -->
-                        <div class="d-flex gap-3 justify-content-end">
-                            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary rounded-3 px-4 py-2">
+                        <div class="d-flex gap-3 justify-content-end pt-3 border-top">
+                            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4 py-2">
                                 <i class="bi bi-x-lg me-2"></i>Cancel
                             </a>
-                            <button type="submit" class="btn btn-primary rounded-3 px-4 py-2" id="submit-btn">
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 py-2" id="submit-btn">
                                 <i class="bi bi-check-circle me-2"></i>Save Changes
                             </button>
                         </div>
@@ -158,20 +197,28 @@
                 </div>
             </div>
 
-            <!-- Account Actions Card -->
-            <div class="card border-0 shadow-sm rounded-4 mt-4">
-                <div class="card-body p-4">
+            <!-- Danger Zone Card -->
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white border-0 pt-4 px-4">
                     <div class="d-flex align-items-center">
-                        <div class="bg-danger bg-opacity-10 p-3 rounded-3 me-3">
+                        <div class="bg-danger bg-opacity-10 p-2 rounded-3 me-3">
                             <i class="bi bi-shield-exclamation fs-4 text-danger"></i>
                         </div>
                         <div>
-                            <h5 class="fw-semibold mb-1">Danger Zone</h5>
-                            <p class="text-muted small mb-2">Permanently delete your account and all associated data</p>
-                            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
-                                <i class="bi bi-trash3 me-1"></i>Delete Account
-                            </button>
+                            <h4 class="h5 fw-semibold mb-1">Danger Zone</h4>
+                            <p class="text-muted small mb-0">Irreversible account actions</p>
                         </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
+                        <div>
+                            <h6 class="fw-semibold mb-1">Delete Account</h6>
+                            <p class="text-muted small mb-0">Permanently delete your account and all associated data</p>
+                        </div>
+                        <button type="button" class="btn btn-outline-danger rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                            <i class="bi bi-trash3 me-2"></i>Delete Account
+                        </button>
                     </div>
                 </div>
             </div>
@@ -207,7 +254,7 @@
                         <i class="bi bi-info-circle me-1"></i>
                         To confirm, please type <strong class="text-dark">DELETE</strong> below:
                     </p>
-                    <input type="text" class="form-control" id="delete-confirm" placeholder="DELETE">
+                    <input type="text" class="form-control rounded-3" id="delete-confirm" placeholder="DELETE">
                 </div>
             </div>
             <div class="modal-footer border-0 pt-0 px-4 pb-4">

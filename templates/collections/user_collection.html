@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/collection_detail.css' %}">
+<div class="container py-5">
+    <!-- Header with Breadcrumb -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'user_collections' %}" class="text-decoration-none">Collections</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ collection.title }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Collection Header -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-4">
+                <div class="d-flex align-items-center gap-3">
+                    <!-- Collection Icon with dynamic color -->
+                    <div class="collection-icon-large" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                        <i class="bi bi-folder-fill fs-1 text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="display-5 fw-bold text-primary mb-2">{{ collection.title }}</h1>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2">
+                                <i class="bi bi-files me-1"></i>{{ collection.records.count }} record{{ collection.records.count|pluralize }}
+                            </span>
+                            <span class="text-muted">
+                                <i class="bi bi-calendar3 me-1"></i>Created {{ collection.created_at|date:"M d, Y" }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary rounded-pill px-4" onclick="editCollection({{ collection.id }}, '{{ collection.title|escapejs }}', [{% for record in collection.records.all %}{{ record.id }}{% if not forloop.last %}, {% endif %}{% endfor %}])">
+                        <i class="bi bi-pencil me-2"></i>Edit Collection
+                    </button>
+                    <button class="btn btn-outline-danger rounded-pill px-4" onclick="deleteCollection({{ collection.id }}, '{{ collection.title|escapejs }}')">
+                        <i class="bi bi-trash3 me-2"></i>Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs / Filter Bar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 bg-light">
+                <div class="card-body p-3">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                        <div class="d-flex gap-2">
+                            <span class="fw-semibold">Sort by:</span>
+                            <select class="form-select form-select-sm w-auto rounded-pill border-0" id="sortSelect">
+                                <option value="recent">Most Recent</option>
+                                <option value="oldest">Oldest First</option>
+                                <option value="alpha">Alphabetical</option>
+                            </select>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <div class="input-group" style="max-width: 300px;">
+                                <input type="text" class="form-control form-control-sm rounded-pill border-0" 
+                                       id="searchRecords" placeholder="Search in this collection...">
+                                <span class="input-group-text bg-transparent border-0" style="margin-left: -40px; z-index: 10;">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Records Grid -->
+    <div class="row g-4" id="recordsContainer">
+        {% for record in collection.records.all %}
+        <div class="col-12 col-md-6 col-lg-4 record-card" data-title="{{ record.title|lower }}" data-date="{{ record.created_at|date:'U' }}">
+            <div class="card h-100 border-0 shadow-sm rounded-4 hover-lift transition">
+                <!-- Card Header with Color Accent -->
+                <div class="position-relative">
+                    <div class="collection-color-bar" style="height: 8px; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 16px 16px 0 0;"></div>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="card-title fw-semibold mb-0">{{ record.title }}</h5>
+                        <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill">
+                            <i class="bi bi-bookmarks me-1"></i>{{ record.number_of_passages }}
+                        </span>
+                    </div>
+                    
+                    <!-- Note Preview -->
+                    <p class="card-text text-secondary small mb-3">
+                        {{ record.note.plain|truncatechars:100 }}
+                    </p>
+                    
+                    <!-- Meta Information -->
+                    <div class="d-flex flex-column gap-2 mb-3">
+                        <div class="d-flex align-items-center text-muted small">
+                            <i class="bi bi-calendar3 me-2"></i>
+                            <span>Created: {{ record.created_at|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="d-flex align-items-center text-muted small">
+                            <i class="bi bi-clock-history me-2"></i>
+                            <span>Updated: {{ record.last_updated_at|date:"M d, Y" }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Passage Preview (if any) -->
+                    {% with passages=record.record_passages.all|slice:":2" %}
+                        {% if passages %}
+                            <div class="passage-previews bg-light rounded-3 p-2 mb-3">
+                                <small class="text-muted d-block mb-1">
+                                    <i class="bi bi-quote me-1"></i>Recent passages:
+                                </small>
+                                {% for passage in passages %}
+                                    <div class="small text-truncate">{{ passage.passage_formatted|safe }}</div>
+                                {% endfor %}
+                                {% if record.record_passages.count > 2 %}
+                                    <small class="text-muted">+{{ record.record_passages.count|add:"-2" }} more</small>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+
+                <!-- Card Footer -->
+                <div class="card-footer bg-transparent border-0 pb-4 px-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'user_record' record.id %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                            <i class="bi bi-eye me-1"></i>View Record
+                        </a>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <!-- Empty State -->
+        <div class="col-12">
+            <div class="text-center py-5">
+                <div class="empty-state-icon mb-4">
+                    <i class="bi bi-folder-x fs-1 text-muted"></i>
+                </div>
+                <h3 class="h4 fw-semibold mb-2">No records in this collection</h3>
+                <p class="text-muted mb-4">Start adding records to organize your studies</p>
+                <button class="btn btn-primary rounded-pill px-4" onclick="editCollection({{ collection.id }}, '{{ collection.title|escapejs }}', [])">
+                    <i class="bi bi-plus-circle me-2"></i>Add Records
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Add More Records Card (if collection has records) -->
+    {% if collection.records.all %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 bg-light">
+                <div class="card-body p-4">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+                        <div>
+                            <h5 class="fw-semibold mb-1">
+                                <i class="bi bi-plus-circle text-primary me-2"></i>Want to add more?
+                            </h5>
+                            <p class="text-muted small mb-0">Add more records to this collection from your existing records</p>
+                        </div>
+                        <button class="btn btn-primary rounded-pill px-4" onclick="editCollection({{ collection.id }}, '{{ collection.title|escapejs }}', [{% for record in collection.records.all %}{{ record.id }}{% if not forloop.last %}, {% endif %}{% endfor %}])">
+                            <i class="bi bi-folder-plus me-2"></i>Manage Records
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+
+<!-- Include the same modals from collections page (edit, delete) -->
+{% include 'collections/modals.html' %}
+<script src="{% static 'js/collection.js' %}"></script>
+{% endblock %}

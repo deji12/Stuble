@@ -20,7 +20,12 @@ from .views import (
     # records
     create_record, user_records, 
     user_record, edit_record,
-    delete_record
+    delete_record,
+
+    # collections
+    user_collections, create_collection,
+    edit_collection, delete_collection,
+    user_collection
 )
 
 urlpatterns = [
@@ -45,11 +50,18 @@ urlpatterns = [
     path("api/bible/passage/", get_chapter_passage, name="get_chapter_passage"),
 
     # records
-    path('create-record/', create_record, name='create_record'),
     path('records/', user_records, name='user_records'),
+    path('create-record/', create_record, name='create_record'),
     path('records/<int:record_id>/', user_record, name='user_record'),
     path('records/<int:record_id>/edit/', edit_record, name='edit_record'),
     path('records/<int:record_id>/delete/', delete_record, name='delete_record'),
+
+    # collections
+    path('collections/', user_collections, name='user_collections'),
+    path('collections/<int:collection_id>/', user_collection, name='user_collection'),
+    path('collections/create', create_collection, name='create_collection'),
+    path('collections/edit', edit_collection, name='edit_collection'),
+    path('collections/delete/', delete_collection, name='delete_collection'),
 
     # admin
     path('send-bulk-emails/', send_out_bulk_email, name='send_bulk_email'),

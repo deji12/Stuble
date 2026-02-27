@@ -38,6 +38,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=30, help_text="User first name.")
     last_name = models.CharField(max_length=30, help_text="User first name.")
 
+    number_of_records = models.PositiveIntegerField(default=0)
+    number_of_saved_passages = models.PositiveIntegerField(default=0)
+    number_of_collections = models.PositiveIntegerField(default=0)
+
     is_staff =  models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False, help_text="Indicates whether the user has all admin permissions. Defaults to False.")
     is_active = models.BooleanField(default=True, help_text="Indicates whether the user account is active. Defaults to False and user needs to verify email on signup before it can be set to True.")
@@ -45,6 +49,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_used_ip_address = models.GenericIPAddressField(null=True, blank=True, help_text="The last IP address used by the user.")
     date_joined = models.DateTimeField(auto_now_add=True, help_text="The date and time when the user joined.")
     
+
     objects = CustomUserManager()
     USERNAME_FIELD = 'email'
 
@@ -116,6 +121,13 @@ class Collection(models.Model):
     title = models.CharField(max_length=100)
     user = models.ForeignKey(User, on_delete = models.CASCADE, related_name='collections')
     records = models.ManyToManyField(Record)
+    
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    last_updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    is_deleted = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title
 
 class WaitingList(models.Model):
     

@@ -197,3 +197,159 @@
         margin: 1rem;
     }
 }
+
+.record-icon-large {
+    width: 70px;
+    height: 70px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2);
+}
+
+.breadcrumb {
+    background: transparent;
+    padding: 0;
+}
+
+.breadcrumb-item a {
+    color: #667eea;
+    text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+    text-decoration: underline;
+}
+
+.breadcrumb-item.active {
+    color: #64748b;
+}
+
+/* Quill Editor Customization */
+.ql-container {
+    height: 250px;
+    font-family: 'Inter', sans-serif;
+}
+
+.ql-toolbar {
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+    background: white;
+}
+
+.ql-container {
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    background: white;
+}
+
+.quill-wrapper {
+    transition: all 0.3s ease;
+}
+
+/* Form Elements */
+.form-control-lg {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.1);
+}
+
+.bg-light {
+    background-color: #f8fafc !important;
+}
+
+/* Accordion Styling */
+.accordion-item {
+    border: none;
+    background: transparent;
+}
+
+.accordion-button {
+    background: white;
+    font-weight: 500;
+    color: #2d3748;
+    padding: 1rem 1.25rem;
+    box-shadow: none !important;
+}
+
+.accordion-button:not(.collapsed) {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.accordion-button:not(.collapsed) i {
+    color: white !important;
+}
+
+.accordion-body {
+    background: #f8fafc;
+    border-radius: 0 0 12px 12px;
+}
+
+.empty-state-icon {
+    width: 60px;
+    height: 60px;
+    background: #f8fafc;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.tracking-wide {
+    letter-spacing: 0.025em;
+}
+
+/* Transitions */
+#form-column,
+#accordion-column {
+    transition: all 0.4s ease-in-out;
+}
+
+@media (max-width: 768px) {
+    .record-icon-large {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .record-icon-large i {
+        font-size: 1.5rem !important;
+    }
+    
+    .display-5 {
+        font-size: 2rem;
+    }
+}
+
+.passage {
+    max-width: 720px;
+    margin: 40px auto;
+    font-family: "Georgia", serif;
+    line-height: 1.8;
+    font-size: 18px;
+    color: #222;
+}
+
+.passage p.p {
+    margin-bottom: 1.2em;
+}
+
+.passage span.v {
+    font-weight: bold;
+    font-size: 0.85em;
+    vertical-align: super;
+    color: #555;
+    margin-right: 4px;
+}
+
+.passage span.add {
+    font-style: italic;
+    opacity: 0.8;
+}

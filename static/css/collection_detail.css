@@ -1,0 +1,71 @@
+.collection-icon-large {
+    width: 70px;
+    height: 70px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2);
+}
+
+.hover-lift {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+.breadcrumb {
+    background: transparent;
+    padding: 0;
+}
+
+.breadcrumb-item a {
+    color: #667eea;
+}
+
+.breadcrumb-item.active {
+    color: #64748b;
+}
+
+.empty-state-icon {
+    width: 80px;
+    height: 80px;
+    background: #f8fafc;
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.passage-previews {
+    font-size: 0.85rem;
+    border-left: 3px solid #667eea;
+}
+
+.form-select-sm, .form-control-sm {
+    font-size: 0.9rem;
+    padding: 0.4rem 1rem;
+}
+
+.input-group-text {
+    background: transparent;
+}
+
+@media (max-width: 768px) {
+    .display-5 {
+        font-size: 2rem;
+    }
+    
+    .collection-icon-large {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .collection-icon-large i {
+        font-size: 1.5rem;
+    }
+}
