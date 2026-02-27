@@ -3,10 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Stuble - Your Digital Workspace{% endblock %}</title>
-    {% load static %}
+    
+    <!-- Primary Meta Tags -->
+    <title>{% block title %}Stuble - Bible Study Platform | Digital Scripture Workspace{% endblock %}</title>
+    <meta name="title" content="{% block meta_title %}Stuble - Bible Study Platform | Digital Scripture Workspace{% endblock %}">
+    <meta name="description" content="{% block meta_description %}Stuble helps you dive deep into God's Word. Read multiple Bible versions, take notes, create records, and track your spiritual growth all in one place.{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}Bible study, scripture, Bible versions, KJV, NIV, ESV, Bible notes, Christian app, Bible journaling, scripture study, Bible reading plan{% endblock %}">
+    <meta name="author" content="Stuble">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}Stuble - Bible Study Platform{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Study scripture deeper with multiple Bible versions, rich note-taking, and organized records. Your digital companion for meaningful Bible study.{% endblock %}">
+    <meta property="og:image" content="https://img.icons8.com/fluency/512/holy-bible.png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:site_name" content="Stuble">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="{% block twitter_url %}{{ request.build_absolute_uri }}{% endblock %}">
+    <meta name="twitter:title" content="{% block twitter_title %}Stuble - Bible Study Platform{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}Study scripture deeper with multiple Bible versions, rich note-taking, and organized records.{% endblock %}">
+    <meta name="twitter:image" content="https://img.icons8.com/fluency/512/holy-bible.png">
+    
+    <!-- JSON-LD Structured Data (Schema.org) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Stuble",
+        "url": "https://stuble.site",
+        "description": "Bible study platform with multiple versions, note-taking, and record management",
+        "applicationCategory": "Religious Application",
+        "operatingSystem": "Web",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "author": {
+            "@type": "Organization",
+            "name": "Stuble",
+            "url": "https://stuble.site"
+        },
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://stuble.site/bible/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://img.icons8.com/color/48/holy-bible.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://img.icons8.com/color/16/holy-bible.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://img.icons8.com/color/32/holy-bible.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="https://img.icons8.com/color/48/holy-bible.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="https://img.icons8.com/color/96/holy-bible.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://img.icons8.com/color/180/holy-bible.png">
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
+    
+    <!-- Preconnect to External Resources -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Existing Resources -->
     <!-- jQuery -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -14,18 +87,15 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
-    <!-- Google Fonts -->
+    <!-- Google Fonts (optimized) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Custom Base Styles -->
-    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}?v=1.0">
     
-    <link rel="icon" type="image/png" href="https://img.icons8.com/color/48/holy-bible.png">
-
     <!-- Block for additional head content -->
     {% block extra_head %}{% endblock %}
 </head>
-
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg fixed-top">

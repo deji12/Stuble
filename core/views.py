@@ -191,7 +191,7 @@ def register(request):
             password = password
         )
 
-        email, created = WaitingList.objects.create(email=email)
+        email, created = WaitingList.objects.get_or_create(email=email)
 
         login(request, user)
         return redirect('dashboard')
