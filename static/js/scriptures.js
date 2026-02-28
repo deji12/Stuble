@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             </div>
         `;
-        accordionBody.insertAdjacentHTML('afterbegin',preparedPassage);
+        accordionBody.insertAdjacentHTML('beforeend',preparedPassage);
 
         if (document.querySelector('#accordionFlushExample').children.length > 0 && !displayedScripture) {
             showScriptureAccordion();

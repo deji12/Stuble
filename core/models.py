@@ -88,7 +88,7 @@ class PasswordResetCode(models.Model):
 class Record(models.Model):
 
     user = models.ForeignKey(User, on_delete = models.CASCADE, related_name='records')
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=300)
     note = QuillField()
     number_of_images = models.PositiveIntegerField(default=0)
     number_of_passages = models.PositiveIntegerField(default=0)

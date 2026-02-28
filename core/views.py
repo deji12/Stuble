@@ -459,7 +459,7 @@ def create_record(request):
 
 @login_required
 def user_records(request):
-    records = Record.objects.filter(user=request.user).order_by('-created_at')
+    records = Record.objects.filter(user=request.user, is_deleted=False).order_by('-created_at')
     
     search_query = request.GET.get('q', '')
     if search_query:
@@ -486,7 +486,7 @@ def user_record(request, record_id):
 
     context = {
         'record': record,
-        'passages': record.record_passages.all().order_by('-id')
+        'passages': record.record_passages.all().order_by('id')
     }
     return render(request, 'records/record.html', context)
 
