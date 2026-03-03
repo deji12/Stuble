@@ -643,7 +643,7 @@ def create_collection(request):
             new_collection.records.set(records)  
 
         user.number_of_collections += 1
-        user.save(updated_fields=['number_of_collections'])
+        user.save(update_fields=['number_of_collections'])
         
         messages.success(request, 'Collection created successfully')
         return redirect('user_collections')
@@ -700,7 +700,7 @@ def delete_collection(request):
             collection.save(update_fields=['is_deleted'])
 
             user.number_of_collections -= 1
-            user.save(updated_fields=['number_of_collections'])
+            user.save(update_fields=['number_of_collections'])
             messages.success(request, 'Collection deleted successfully')
         except Collection.DoesNotExist:
             messages.error(request, 'Collection not found')
