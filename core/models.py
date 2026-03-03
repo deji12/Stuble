@@ -90,6 +90,7 @@ class Record(models.Model):
     user = models.ForeignKey(User, on_delete = models.CASCADE, related_name='records')
     title = models.CharField(max_length=300)
     note = QuillField()
+    note_plain = models.TextField(blank=True)
     number_of_images = models.PositiveIntegerField(default=0)
     number_of_passages = models.PositiveIntegerField(default=0)
 
@@ -97,6 +98,14 @@ class Record(models.Model):
     last_updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     is_deleted = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        # Extract plain text from Quill's delta or HTML
+        if self.note:
+            # The QuillField provides a .plain attribute (if using modern django-quill-editor)
+            # If that doesn't work, you can strip HTML tags
+            self.note_plain = self.note.plain
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title

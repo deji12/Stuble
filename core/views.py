@@ -14,8 +14,8 @@ from django.urls import reverse
 from .forms import RecordNoteForm, EmailForm
 from django.contrib.auth import update_session_auth_hash
 from .tasks import send_bulk_emails
+from django.db.models import Q
 
-API_BIBLE_BASE_URL = "https://rest.api.bible/v1"
 
 
 # ----------------------------------------------------------------
@@ -63,9 +63,9 @@ def get_chapter_passage(request):
         )
 
     if not verse_id:
-        url = f"{API_BIBLE_BASE_URL}/bibles/{bible_id}/passages/{chapter_id}"
+        url = f"{settings.API_BIBLE_BASE_URL}/bibles/{bible_id}/passages/{chapter_id}"
     else:
-        url = f"{API_BIBLE_BASE_URL}/bibles/{bible_id}/verses/{chapter_id}.{verse_id}"
+        url = f"{settings.API_BIBLE_BASE_URL}/bibles/{bible_id}/verses/{chapter_id}.{verse_id}"
 
     headers = {
         "api-key": settings.API_BIBLE_KEY    
@@ -463,7 +463,9 @@ def user_records(request):
     
     search_query = request.GET.get('q', '')
     if search_query:
-        records = records.filter(title__icontains=search_query)
+        records = records.filter(
+            Q(title__icontains=search_query) | Q(note_plain__icontains=search_query)
+        )
     
     context = {
         'records': records,
@@ -591,7 +593,6 @@ def delete_record(request, record_id):
         messages.error(request, 'Record does not exist')
         
     return redirect('user_records')
-
 
 
 

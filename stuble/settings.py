@@ -204,6 +204,8 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 API_BIBLE_KEY = config('API_BIBLE_KEY')
+API_BIBLE_BASE_URL = config('API_BIBLE_BASE_URL')
+
 LOGIN_URL = 'login_user'
 
 AUTH_USER_MODEL = 'core.User'
