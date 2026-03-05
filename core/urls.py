@@ -59,8 +59,8 @@ urlpatterns = [
     # collections
     path('collections/', user_collections, name='user_collections'),
     path('collections/<int:collection_id>/', user_collection, name='user_collection'),
-    path('collections/create', create_collection, name='create_collection'),
-    path('collections/edit', edit_collection, name='edit_collection'),
+    path('collections/create/', create_collection, name='create_collection'),
+    path('collections/edit/', edit_collection, name='edit_collection'),
     path('collections/delete/', delete_collection, name='delete_collection'),
 
     # admin
