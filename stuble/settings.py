@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from decouple import config
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -93,67 +94,75 @@ if DEBUG:
     }
 else:
     APPEND_SLASH = True 
+    # DATABASES = {
+    #     'default': {
+    #         'ENGINE': 'django.db.backends.postgresql', 
+    #         'NAME': config('DB_NAME'),              
+    #         'USER': config('DB_USER'),         
+    #         'PASSWORD': config('DB_USER_PASSWORD'),                
+    #         'HOST': config('DB_HOST'),                        
+    #         'PORT': config('DB_PORT'),                             
+    #     }
+    # }
+
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql', 
-            'NAME': config('DB_NAME'),              
-            'USER': config('DB_USER'),         
-            'PASSWORD': config('DB_USER_PASSWORD'),                
-            'HOST': config('DB_HOST'),                        
-            'PORT': config('DB_PORT'),                             
-        }
+        'default': dj_database_url.parse(
+            config('DATABASE_URL'),
+            conn_max_age=600,
+            ssl_require=True,
+        )
     }
 
-    CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
-    CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
-    CELERY_RESULT_BACKEND = 'rpc://'  # For RabbitMQ
-    CELERY_ACCEPT_CONTENT = ['json']
-    CELERY_TASK_SERIALIZER = 'json'
-    CELERY_RESULT_SERIALIZER = 'json'
-    CELERY_TIMEZONE = "Africa/Lagos"
-    CELERY_ENABLE_UTC = False
-    CELERY_RESULT_EXTENDED = True
+    # CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+    # CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+    # CELERY_RESULT_BACKEND = 'rpc://'  # For RabbitMQ
+    # CELERY_ACCEPT_CONTENT = ['json']
+    # CELERY_TASK_SERIALIZER = 'json'
+    # CELERY_RESULT_SERIALIZER = 'json'
+    # CELERY_TIMEZONE = "Africa/Lagos"
+    # CELERY_ENABLE_UTC = False
+    # CELERY_RESULT_EXTENDED = True
 
 
-    CELERY_TASK_TRACK_STARTED = True
-    CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 
+    # CELERY_TASK_TRACK_STARTED = True
+    # CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 
 
-    LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
+    # LOGGING = {
+    #     'version': 1,
+    #     'disable_existing_loggers': False,
 
-        'handlers': {
-            # Daily debug/info logs
-            'debug_file': {
-                'level': 'DEBUG',
-                'class': 'logging.handlers.TimedRotatingFileHandler',
-                'filename': BASE_DIR / 'logs/debug.log',
-                'when': 'midnight',
-                'interval': 1,
-                'backupCount': 14,   # keep last 14 days
-                'encoding': 'utf-8',
-            },
+    #     'handlers': {
+    #         # Daily debug/info logs
+    #         'debug_file': {
+    #             'level': 'DEBUG',
+    #             'class': 'logging.handlers.TimedRotatingFileHandler',
+    #             'filename': BASE_DIR / 'logs/debug.log',
+    #             'when': 'midnight',
+    #             'interval': 1,
+    #             'backupCount': 14,   # keep last 14 days
+    #             'encoding': 'utf-8',
+    #         },
 
-            # Daily error logs
-            'error_file': {
-                'level': 'ERROR',
-                'class': 'logging.handlers.TimedRotatingFileHandler',
-                'filename': BASE_DIR / 'logs/error.log',
-                'when': 'midnight',
-                'interval': 1,
-                'backupCount': 30,   # keep last 30 days
-                'encoding': 'utf-8',
-            },
-        },
+    #         # Daily error logs
+    #         'error_file': {
+    #             'level': 'ERROR',
+    #             'class': 'logging.handlers.TimedRotatingFileHandler',
+    #             'filename': BASE_DIR / 'logs/error.log',
+    #             'when': 'midnight',
+    #             'interval': 1,
+    #             'backupCount': 30,   # keep last 30 days
+    #             'encoding': 'utf-8',
+    #         },
+    #     },
 
-        'loggers': {
-            'django': {
-                'handlers': ['debug_file', 'error_file'],
-                'level': 'DEBUG',
-                'propagate': True,
-            },
-        },
-    }
+    #     'loggers': {
+    #         'django': {
+    #             'handlers': ['debug_file', 'error_file'],
+    #             'level': 'DEBUG',
+    #             'propagate': True,
+    #         },
+    #     },
+    # }
 
 
 # Password validation

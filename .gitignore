@@ -3,3 +3,7 @@ db.sqlite3
 __pycache__
 migrations
 helper.txt
+Dockerfile
+docker-compose.yaml
+.dockerignore
+.vscode
